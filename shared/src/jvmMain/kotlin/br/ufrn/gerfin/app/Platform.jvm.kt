@@ -1,6 +1,6 @@
 package br.ufrn.gerfin.app
 
-class JVMPlatform: Platform {
+class JVMPlatform : Platform {
     override val name: String = "Java ${System.getProperty("java.version")}"
 }
 

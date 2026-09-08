@@ -17,5 +17,17 @@ allprojects {
 
     ktlint {
         version.set("1.3.1")
+        filter {
+            exclude { element ->
+                val path = element.file.absolutePath.lowercase()
+                path.contains("build") || path.contains("generated")
+            }
+        }
+    }
+    
+    tasks.matching { it.name.startsWith("ktlint") }.configureEach {
+        if (this is org.gradle.api.tasks.SourceTask) {
+            exclude("**/generated/**", "**/build/**")
+        }
     }
 }

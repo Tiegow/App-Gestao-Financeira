@@ -1,0 +1,14 @@
+root = true
+
+[*.{kt,kts}]
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[**/build/**]
+ktlint_ignore = true
+
+[**/generated/**]
+ktlint_ignore = true
+
+[*generated*/**]
+ktlint_ignore = true
