@@ -42,7 +42,7 @@ Acreditamos que pessoas com dificuldades na organização financeira ou pouca fa
 
 ## Backlog Inicial
 
-Backlog disponível no GitHub Projects do repositório: `[PREENCHER: link do GitHub Projects]`
+Backlog disponível no GitHub Projects do repositório: [https://github.com/users/Tiegow/projects/1]
 
 ## Plataforma-alvo
 
@@ -71,7 +71,7 @@ Referência: SANCHES, 2025.
 |------|-----------|-------|
 | Joab Urbano de Araujo | 20260072887 | FullStack |
 | Marcos Martins Nóbrega | 20240078177 | `[PREENCHER]` |
-| Tiego Rafael Belo da Rocha | 20230034535 | `[PREENCHER]` |
+| Tiego Rafael Belo da Rocha | 20230034535 | FullStack |
 | Vladimir Vieira do Nascimento | 20240078210 | `[PREENCHER]` |
 
 ## Coorte de Apresentação e Integração
