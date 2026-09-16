@@ -72,7 +72,7 @@ Referência: SANCHES, 2025.
 | Joab Urbano de Araujo | 20260072887 | FullStack |
 | Marcos Martins Nóbrega | 20240078177 | FullStack |
 | Tiego Rafael Belo da Rocha | 20230034535 | FullStack |
-| Vladimir Vieira do Nascimento | 20240078210 | `[PREENCHER]` |
+| Vladimir Vieira do Nascimento | 20240078210 | FullStack |
 
 ## Coorte de Apresentação e Integração
 
