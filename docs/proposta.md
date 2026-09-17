@@ -1,5 +1,14 @@
 # Proposta do Produto — GestFin
 
+## Equipe
+
+| Nome | Matrícula | Papel |
+|------|-----------|-------|
+| Joab Urbano de Araujo | 20260072887 | FullStack |
+| Marcos Martins Nóbrega | 20240078177 | FullStack |
+| Tiego Rafael Belo da Rocha | 20230034535 | FullStack |
+| Vladimir Vieira do Nascimento | 20240078210 | FullStack |
+
 ## Visão do Produto
 
 Para pessoas que possuem dificuldades em organizar suas finanças pessoais, em especial usuários endividados ou com pouca familiaridade com ferramentas digitais,
@@ -65,16 +74,7 @@ Foi considerado também o **Firebase** (Opção B), por disponibilizar autentica
 
 Referência: SANCHES, 2025.
 
-## Equipe
-
-| Nome | Matrícula | Papel |
-|------|-----------|-------|
-| Joab Urbano de Araujo | 20260072887 | FullStack |
-| Marcos Martins Nóbrega | 20240078177 | FullStack |
-| Tiego Rafael Belo da Rocha | 20230034535 | FullStack |
-| Vladimir Vieira do Nascimento | 20240078210 | FullStack |
-
 ## Coorte de Apresentação e Integração
 
-- Coorte: 
+- Coorte: Apresentação Remota
 - Integração com outra disciplina: Esse projeto não será utilizzado em outra diciplina
