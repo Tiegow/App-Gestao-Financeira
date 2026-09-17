@@ -78,3 +78,7 @@ Referência: SANCHES, 2025.
 
 - Coorte: Apresentação Remota
 - Integração com outra disciplina: Esse projeto não será utilizzado em outra diciplina
+
+## Vídeo de Apresentação da S0
+YouTube: [https://youtu.be/vWtz329z3U8]
+
