@@ -24,7 +24,7 @@ allprojects {
             }
         }
     }
-    
+
     tasks.matching { it.name.startsWith("ktlint") }.configureEach {
         if (this is org.gradle.api.tasks.SourceTask) {
             exclude("**/generated/**", "**/build/**")
