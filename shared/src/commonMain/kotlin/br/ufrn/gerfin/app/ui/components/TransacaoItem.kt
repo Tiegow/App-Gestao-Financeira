@@ -38,7 +38,7 @@ fun TransacaoItem(transacao: Transacao) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = transacao.descricao,
+                text = transacao.categoria,
                 style = MaterialTheme.typography.bodyLarge,
             )
             Text(

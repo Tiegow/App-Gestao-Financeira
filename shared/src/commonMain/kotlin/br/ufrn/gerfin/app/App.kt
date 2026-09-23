@@ -24,9 +24,9 @@ fun App() {
         var transacoes by remember {
             mutableStateOf(
                 listOf(
-                    Transacao("1", "Salário", "3.000,00", true),
-                    Transacao("2", "Supermercado", "450,00", false),
-                    Transacao("3", "Conta de Luz", "120,00", false),
+                    Transacao("1", "3.000,00", true, "01/10/2026", "Salário", "Pix", "Pagamento mensal"),
+                    Transacao("2", "450,00", false, "05/10/2026", "Alimentação", "Cartão de Crédito", "Supermercado"),
+                    Transacao("3", "120,00", false, "10/10/2026", "Moradia", "Boleto", "Conta de Luz"),
                 ),
             )
         }
