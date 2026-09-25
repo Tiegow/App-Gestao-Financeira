@@ -26,3 +26,12 @@ compose.desktop {
         }
     }
 }
+
+tasks.register("printRunClasspath") {
+    doLast {
+        println("RUN CLASSPATH:")
+        configurations.runtimeClasspath.get().forEach {
+            println(it.absolutePath)
+        }
+    }
+}

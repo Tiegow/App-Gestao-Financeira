@@ -21,9 +21,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+import androidx.compose.ui.tooling.preview.Preview
+
+@Preview
+@Composable
+fun CampoDataPreview() {
+    CampoData(dataSelecionada = "01/10/2026", onDataChange = {}, isErro = false)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,16 +73,8 @@ fun CampoData(
                 TextButton(
                     onClick = {
                         datePickerState.selectedDateMillis?.let { millis ->
-                            val localDate =
-                                Instant
-                                    .fromEpochMilliseconds(millis)
-                                    .toLocalDateTime(TimeZone.UTC)
-
-                            val dia = localDate.dayOfMonth.toString().padStart(2, '0')
-                            val mes = localDate.monthNumber.toString().padStart(2, '0')
-                            val ano = localDate.year
-
-                            onDataChange("$dia/$mes/$ano")
+                            val dataStr = br.ufrn.gerfin.app.utils.formatMillisToDateString(millis)
+                            onDataChange(dataStr)
                         }
                         mostrarModal = false
                     },
