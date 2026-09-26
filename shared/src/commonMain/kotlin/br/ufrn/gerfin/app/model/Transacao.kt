@@ -8,4 +8,5 @@ data class Transacao(
     val categoria: String,
     val formaPagamento: String,
     val observacoes: String,
+    val isPago: Boolean = false,
 )

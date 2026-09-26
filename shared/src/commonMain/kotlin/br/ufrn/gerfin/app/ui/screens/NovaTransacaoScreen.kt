@@ -48,6 +48,8 @@ fun NovaTransacaoScreen(
     var formaPagamento by remember { mutableStateOf("") }
     var observacoes by remember { mutableStateOf("") }
 
+    var isPago by remember { mutableStateOf(true) }
+
     val categoriasDespesa = listOf("Alimentação", "Moradia", "Transporte", "Saúde", "Lazer", "Outros")
     val categoriasReceita = listOf("Salário", "Rendimentos", "Vendas", "Outros")
     val opcoesCategoria = if (isReceita) categoriasReceita else categoriasDespesa
@@ -108,6 +110,21 @@ fun NovaTransacaoScreen(
                 isErro = !isDataValida && dataRaw.isNotEmpty(),
             )
 
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = if (isReceita) "Valor já recebido?" else "Conta já paga?",
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+                androidx.compose.material3.Switch(
+                    checked = isPago,
+                    onCheckedChange = { isPago = it },
+                )
+            }
+
             CampoDropdown(
                 label = "Categoria",
                 opcoes = opcoesCategoria,
@@ -149,6 +166,7 @@ fun NovaTransacaoScreen(
                                 categoria = categoria,
                                 formaPagamento = formaPagamento,
                                 observacoes = observacoes.trim(),
+                                isPago = isPago,
                             ),
                         )
                     }

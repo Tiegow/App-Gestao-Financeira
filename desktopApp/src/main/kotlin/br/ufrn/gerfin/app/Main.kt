@@ -3,7 +3,7 @@ package br.ufrn.gerfin.app
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
-fun main() =
+fun main() {
     application {
         Window(
             onCloseRequest = ::exitApplication,
@@ -12,3 +12,4 @@ fun main() =
             App()
         }
     }
+}
