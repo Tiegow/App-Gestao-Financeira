@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 
 @Preview
 @Composable
+@Suppress("FunctionNaming", "ktlint:standard:function-naming")
 fun CampoDataPreview() {
     CampoData(dataSelecionada = "01/10/2026", onDataChange = {}, isErro = false)
 }
@@ -73,7 +74,9 @@ fun CampoData(
                 TextButton(
                     onClick = {
                         datePickerState.selectedDateMillis?.let { millis ->
-                            val dataStr = br.ufrn.gerfin.app.utils.formatMillisToDateString(millis)
+                            val dataStr =
+                                br.ufrn.gerfin.app.utils
+                                    .formatMillisToDateString(millis)
                             onDataChange(dataStr)
                         }
                         mostrarModal = false
