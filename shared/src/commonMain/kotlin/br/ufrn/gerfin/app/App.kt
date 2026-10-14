@@ -123,6 +123,9 @@ fun App() {
                 LoginScreen(
                     onEntrar = {
                         navController.navigate(DashboardRoute)
+                    },
+                    onRegistro = {
+                        println("oi")
                     }
                 )
             }

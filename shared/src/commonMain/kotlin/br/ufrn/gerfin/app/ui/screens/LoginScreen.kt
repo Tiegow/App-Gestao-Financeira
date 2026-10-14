@@ -14,12 +14,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextButton
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun LoginScreen(onEntrar: () -> Unit) {
+fun LoginScreen(
+    onEntrar: () -> Unit,
+    onRegistro: () -> Unit
+) {
     var email by remember { mutableStateOf("") }
     var senha by remember { mutableStateOf( value="" ) }
 
@@ -54,5 +58,11 @@ fun LoginScreen(onEntrar: () -> Unit) {
                 onEntrar()
             }
         ) { Text("Entrar") }
+
+        TextButton(
+            onClick = {
+                onRegistro()
+            }
+        ) { Text("Não tem conta? Registre-se") }
     }
 }
