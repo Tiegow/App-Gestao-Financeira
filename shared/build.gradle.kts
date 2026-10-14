@@ -52,6 +52,13 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.compose.uiTooling)
+            implementation(libs.ktor.client.okhttp)
+        }
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
+        }
+        jvmMain.dependencies {
+            implementation(libs.ktor.client.okhttp)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -67,6 +74,10 @@ kotlin {
             implementation(libs.androidx.savedstate)
             implementation(libs.navigation.compose)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.datetime.lib)
+            implementation(project.dependencies.platform(libs.supabase.bom))
+            implementation(libs.supabase.postgrest)
+            implementation(libs.supabase.auth)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
