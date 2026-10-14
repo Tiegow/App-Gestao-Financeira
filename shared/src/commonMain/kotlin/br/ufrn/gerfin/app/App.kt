@@ -14,8 +14,11 @@ import br.ufrn.gerfin.app.model.Transacao
 import br.ufrn.gerfin.app.navigation.DashboardRoute
 import br.ufrn.gerfin.app.navigation.NovaTransacaoRoute
 import br.ufrn.gerfin.app.ui.screens.DashboardScreen
+import br.ufrn.gerfin.app.ui.screens.LoginScreen
 import br.ufrn.gerfin.app.ui.screens.NovaTransacaoScreen
 import kotlin.math.round
+import br.ufrn.gerfin.app.navigation.LoginRoute
+import androidx.compose.material3.Text
 
 private fun parseValor(valorStr: String): Double {
     val limpo = valorStr.replace(".", "").replace(",", ".")
@@ -40,12 +43,31 @@ private fun formatarValor(valor: Double): String {
 @Suppress("FunctionNaming", "ktlint:standard:function-naming", "LongMethod")
 fun App() {
     MaterialTheme {
+        val navController = rememberNavController()
+
         var transacoes by remember {
             mutableStateOf(
                 listOf(
-                    Transacao("1", "3.000,00", true, "01/10/2026", "Salário", "Pix", "Pagamento mensal", true),
-                    Transacao("2", "450,00", false, "05/10/2026", "Alimentação", "Cartão de Crédito", "Supermercado", true),
-                    Transacao("3", "120,00", false, "10/11/2026", "Moradia", "Boleto", "Conta de Luz futura", false),
+                    Transacao(
+                        "1",
+                        "3.000,00",
+                        true,
+                        "01/10/2026",
+                        "Salário",
+                        "Pix",
+                        "Pagamento mensal",
+                        true
+                    ),
+                    Transacao(
+                        "2",
+                        "450,00",
+                        false,
+                        "05/10/2026",
+                        "Alimentação",
+                        "Cartão de Crédito",
+                        "Supermercado",
+                        true
+                    ),
                 ),
             )
         }
@@ -83,18 +105,28 @@ fun App() {
                 }
             }
 
-        val totalReceitas = transacoesDoMes.filter { it.isReceita }.sumOf { parseValor(it.valor) }
-        val totalDespesasPagas = transacoesDoMes.filter { !it.isReceita && it.isPago }.sumOf { parseValor(it.valor) }
-        val totalDespesasAberto = transacoesDoMes.filter { !it.isReceita && !it.isPago }.sumOf { parseValor(it.valor) }
+        val totalReceitas =
+            transacoesDoMes.filter { it.isReceita }.sumOf { parseValor(it.valor) }
+        val totalDespesasPagas = transacoesDoMes.filter { !it.isReceita && it.isPago }
+            .sumOf { parseValor(it.valor) }
+        val totalDespesasAberto = transacoesDoMes.filter { !it.isReceita && !it.isPago }
+            .sumOf { parseValor(it.valor) }
 
         val saldoMes = totalReceitas - totalDespesasPagas - totalDespesasAberto
 
-        val navController = rememberNavController()
 
         NavHost(
             navController = navController,
-            startDestination = DashboardRoute,
+            startDestination = LoginRoute,
         ) {
+            composable<LoginRoute> {
+                LoginScreen(
+                    onEntrar = {
+                        navController.navigate(DashboardRoute)
+                    }
+                )
+            }
+
             composable<DashboardRoute> {
                 DashboardScreen(
                     mesAtualNome = "${mesesNomes[mesAtual]} $anoAtual",
@@ -122,7 +154,7 @@ fun App() {
                     onNovaTransacao = {
                         navController.navigate(NovaTransacaoRoute)
                     },
-                )
+                    )
             }
 
             composable<NovaTransacaoRoute> {
@@ -134,7 +166,7 @@ fun App() {
                     onCancelar = {
                         navController.popBackStack()
                     },
-                )
+                    )
             }
         }
     }

@@ -7,3 +7,6 @@ data object DashboardRoute
 
 @Serializable
 data object NovaTransacaoRoute
+
+@Serializable
+data object LoginRoute
