@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun LoginScreen(
     onEntrar: () -> Unit,
-    onRegistro: () -> Unit
+    onRegister: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var senha by remember { mutableStateOf( value="" ) }
@@ -61,7 +61,7 @@ fun LoginScreen(
 
         TextButton(
             onClick = {
-                onRegistro()
+                onRegister()
             }
         ) { Text("Não tem conta? Registre-se") }
     }

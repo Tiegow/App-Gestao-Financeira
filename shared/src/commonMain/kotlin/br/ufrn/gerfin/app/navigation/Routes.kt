@@ -10,3 +10,6 @@ data object NovaTransacaoRoute
 
 @Serializable
 data object LoginRoute
+
+@Serializable
+data object RegisterRoute

@@ -12,13 +12,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import br.ufrn.gerfin.app.model.Transacao
 import br.ufrn.gerfin.app.navigation.DashboardRoute
+import br.ufrn.gerfin.app.navigation.RegisterRoute
 import br.ufrn.gerfin.app.navigation.NovaTransacaoRoute
 import br.ufrn.gerfin.app.ui.screens.DashboardScreen
 import br.ufrn.gerfin.app.ui.screens.LoginScreen
 import br.ufrn.gerfin.app.ui.screens.NovaTransacaoScreen
 import kotlin.math.round
 import br.ufrn.gerfin.app.navigation.LoginRoute
-import androidx.compose.material3.Text
+import br.ufrn.gerfin.app.ui.screens.RegisterScreen
 
 private fun parseValor(valorStr: String): Double {
     val limpo = valorStr.replace(".", "").replace(",", ".")
@@ -124,8 +125,19 @@ fun App() {
                     onEntrar = {
                         navController.navigate(DashboardRoute)
                     },
-                    onRegistro = {
+                    onRegister = {
+                        navController.navigate(RegisterRoute)
+                    }
+                )
+            }
+
+            composable<RegisterRoute> {
+                RegisterScreen(
+                    onRegister = {
                         println("oi")
+                    },
+                    onVoltar = {
+                        navController.navigate(LoginRoute)
                     }
                 )
             }
