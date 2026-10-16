@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import br.ufrn.gerfin.app.ui.theme.AppTheme
 
 @Composable
 @Suppress("FunctionNaming", "ktlint:standard:function-naming")
@@ -60,9 +61,7 @@ fun ResumoCard(
                         "R$ $receitas",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
-                        color =
-                            androidx.compose.ui.graphics
-                                .Color(0xFF2E7D32),
+                        color = AppTheme.colors.receita,
                     )
                 }
                 Column {
@@ -80,9 +79,7 @@ fun ResumoCard(
                         "R$ $despesasAberto",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
-                        color =
-                            androidx.compose.ui.graphics
-                                .Color(0xFFC62828),
+                        color = AppTheme.colors.despesa,
                     )
                 }
             }
