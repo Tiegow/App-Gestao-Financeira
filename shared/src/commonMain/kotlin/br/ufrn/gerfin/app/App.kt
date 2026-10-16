@@ -10,6 +10,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import br.ufrn.gerfin.app.data.login
 import br.ufrn.gerfin.app.model.Transacao
 import br.ufrn.gerfin.app.navigation.DashboardRoute
 import br.ufrn.gerfin.app.navigation.RegisterRoute
@@ -20,6 +21,10 @@ import br.ufrn.gerfin.app.ui.screens.NovaTransacaoScreen
 import kotlin.math.round
 import br.ufrn.gerfin.app.navigation.LoginRoute
 import br.ufrn.gerfin.app.ui.screens.RegisterScreen
+import androidx.compose.runtime.rememberCoroutineScope
+import br.ufrn.gerfin.app.exception.CadastroException
+import br.ufrn.gerfin.app.data.register
+import kotlinx.coroutines.launch
 
 private fun parseValor(valorStr: String): Double {
     val limpo = valorStr.replace(".", "").replace(",", ".")
@@ -45,6 +50,8 @@ private fun formatarValor(valor: Double): String {
 fun App() {
     MaterialTheme {
         val navController = rememberNavController()
+        val scope = rememberCoroutineScope()
+        var mensagemErro by remember { mutableStateOf<String?>(null) }
 
         var transacoes by remember {
             mutableStateOf(
@@ -122,8 +129,21 @@ fun App() {
         ) {
             composable<LoginRoute> {
                 LoginScreen(
-                    onEntrar = {
-                        navController.navigate(DashboardRoute)
+                    mensagemErro = mensagemErro,
+
+                    onEntrar = { email, senha ->
+                        scope.launch {
+                            try {
+                                login(email, senha)
+                                navController.navigate(DashboardRoute)
+                            } catch (e: Exception) {
+                                mensagemErro = if (e is CadastroException) {
+                                    e.message
+                                } else {
+                                    "Não foi possível fazer login."
+                                }
+                            }
+                        }
                     },
                     onRegister = {
                         navController.navigate(RegisterRoute)
@@ -133,8 +153,30 @@ fun App() {
 
             composable<RegisterRoute> {
                 RegisterScreen(
-                    onRegister = {
-                        println("oi")
+                    mensagemErro = mensagemErro,
+
+                    onRegister = { email, senha01, senha02 ->
+                        scope.launch {
+                            try {
+                                if (email.isBlank()) {
+                                    throw CadastroException("Informe o e-mail.")
+                                }
+                                if (senha01.isBlank()) {
+                                    throw CadastroException("Informe a senha.")
+                                }
+                                if (senha02.isBlank()) {
+                                    throw CadastroException("Informe a confirmação da senha.")
+                                }
+                                register(email, senha01, senha02)
+                                navController.popBackStack()
+                            } catch (e: Exception) {
+                                mensagemErro = if (e is CadastroException) {
+                                    e.message
+                                } else {
+                                    "Não foi possível realizar o cadastro."
+                                }
+                            }
+                        }
                     },
                     onVoltar = {
                         navController.navigate(LoginRoute)

@@ -21,8 +21,9 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun LoginScreen(
-    onEntrar: () -> Unit,
-    onRegister: () -> Unit
+    onEntrar: (String, String) -> Unit,
+    onRegister: () -> Unit,
+    mensagemErro: String?,
 ) {
     var email by remember { mutableStateOf("") }
     var senha by remember { mutableStateOf( value="" ) }
@@ -55,7 +56,7 @@ fun LoginScreen(
 
         Button(
             onClick = {
-                onEntrar()
+                onEntrar(email, senha)
             }
         ) { Text("Entrar") }
 
@@ -64,5 +65,12 @@ fun LoginScreen(
                 onRegister()
             }
         ) { Text("Não tem conta? Registre-se") }
+
+        mensagemErro?.let { mensagem ->
+            Text(
+                text = mensagem,
+                color = MaterialTheme.colorScheme.error
+            )
+        }
     }
 }

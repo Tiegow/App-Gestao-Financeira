@@ -24,11 +24,13 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 
 @Composable
 fun RegisterScreen(
-    onRegister: () -> Unit,
-    onVoltar: () -> Unit
+    onRegister: (String, String, String) -> Unit,
+    onVoltar: () -> Unit,
+    mensagemErro: String?,
 ) {
     var email by remember { mutableStateOf("") }
-    var senha by remember { mutableStateOf( value="" ) }
+    var senha01 by remember { mutableStateOf( value="" ) }
+    var senha02 by remember { mutableStateOf( value="" ) }
 
     Box(
         modifier = Modifier
@@ -54,26 +56,33 @@ fun RegisterScreen(
             )
 
             OutlinedTextField(
-                value = senha,
+                value = senha01,
                 onValueChange = { senhaDigitada ->
-                    senha = senhaDigitada
+                    senha01 = senhaDigitada
                 },
                 label = { Text("Digite sua senha") }
             )
 
             OutlinedTextField(
-                value = senha,
+                value = senha02,
                 onValueChange = { senhaDigitada ->
-                    senha = senhaDigitada
+                    senha02 = senhaDigitada
                 },
                 label = { Text("Digite novamente sua senha") }
             )
 
             Button(
                 onClick = {
-                    onRegister()
+                    onRegister(email, senha01, senha02)
                 }
             ) { Text("Registrar-se") }
+
+            mensagemErro?.let { mensagem ->
+                Text(
+                    text = mensagem,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
         }
 
         IconButton(
