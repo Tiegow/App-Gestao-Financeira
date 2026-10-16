@@ -11,15 +11,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import br.ufrn.gerfin.app.model.Transacao
+import br.ufrn.gerfin.app.ui.theme.AppTheme
 
 @Composable
 @Suppress("FunctionNaming", "ktlint:standard:function-naming")
 fun TransacaoItem(transacao: Transacao) {
-    val corValor = if (transacao.isReceita) Color(0xFF2E7D32) else Color(0xFFC62828)
+    val corValor = if (transacao.isReceita) AppTheme.colors.receita else AppTheme.colors.despesa
     val sinal = if (transacao.isReceita) "+" else "-"
 
     Card(

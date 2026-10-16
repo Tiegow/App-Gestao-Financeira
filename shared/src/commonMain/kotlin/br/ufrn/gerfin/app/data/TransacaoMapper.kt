@@ -6,11 +6,11 @@ import br.ufrn.gerfin.app.model.TipoLancamento
 import br.ufrn.gerfin.app.model.Transacao
 import br.ufrn.gerfin.app.utils.formatarValor
 import br.ufrn.gerfin.app.utils.parseValor
-import kotlin.math.round
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
+import kotlin.math.round
 
 fun Transacao.toInsertDto(categorias: List<CategoriaDto>): LancamentoInsertDto {
     val tipoCategoria = if (isReceita) TipoCategoria.RECEITA else TipoCategoria.DESPESA
@@ -40,7 +40,7 @@ fun LancamentoDto.toTransacao(categorias: List<CategoriaDto>): Transacao {
     val dia = dataCompetencia.toLocalDateTime(TimeZone.UTC).date
     val dataFormatada =
         "${dia.dayOfMonth.toString().padStart(2, '0')}/" +
-                "${dia.monthNumber.toString().padStart(2, '0')}/${dia.year}"
+            "${dia.monthNumber.toString().padStart(2, '0')}/${dia.year}"
 
     return Transacao(
         id = id.toString(),

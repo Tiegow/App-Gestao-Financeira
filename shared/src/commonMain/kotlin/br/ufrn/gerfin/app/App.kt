@@ -1,25 +1,30 @@
 package br.ufrn.gerfin.app
 
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import br.ufrn.gerfin.app.model.Transacao
 import br.ufrn.gerfin.app.navigation.DashboardRoute
-import br.ufrn.gerfin.app.navigation.RegisterRoute
+import br.ufrn.gerfin.app.navigation.LoginRoute
 import br.ufrn.gerfin.app.navigation.NovaTransacaoRoute
+import br.ufrn.gerfin.app.navigation.RegisterRoute
 import br.ufrn.gerfin.app.ui.screens.DashboardScreen
 import br.ufrn.gerfin.app.ui.screens.LoginScreen
 import br.ufrn.gerfin.app.ui.screens.NovaTransacaoScreen
-import kotlin.math.round
-import br.ufrn.gerfin.app.navigation.LoginRoute
 import br.ufrn.gerfin.app.ui.screens.RegisterScreen
+import br.ufrn.gerfin.app.ui.theme.GestFinTheme
+import kotlin.math.round
 
 private fun parseValor(valorStr: String): Double {
     val limpo = valorStr.replace(".", "").replace(",", ".")
@@ -40,149 +45,170 @@ private fun formatarValor(valor: Double): String {
 }
 
 @Composable
-@Preview
 @Suppress("FunctionNaming", "ktlint:standard:function-naming", "LongMethod")
-fun App() {
-    MaterialTheme {
-        val navController = rememberNavController()
-
-        var transacoes by remember {
-            mutableStateOf(
-                listOf(
-                    Transacao(
-                        "1",
-                        "3.000,00",
-                        true,
-                        "01/10/2026",
-                        "Salário",
-                        "Pix",
-                        "Pagamento mensal",
-                        true
-                    ),
-                    Transacao(
-                        "2",
-                        "450,00",
-                        false,
-                        "05/10/2026",
-                        "Alimentação",
-                        "Cartão de Crédito",
-                        "Supermercado",
-                        true
-                    ),
-                ),
-            )
-        }
-
-        var mesAtual by remember { mutableStateOf(10) }
-        var anoAtual by remember { mutableStateOf(2026) }
-
-        val mesesNomes =
-            listOf(
-                "",
-                "Janeiro",
-                "Fevereiro",
-                "Março",
-                "Abril",
-                "Maio",
-                "Junho",
-                "Julho",
-                "Agosto",
-                "Setembro",
-                "Outubro",
-                "Novembro",
-                "Dezembro",
-            )
-
-        // Filtra transações do mês
-        val transacoesDoMes =
-            transacoes.filter {
-                val parts = it.data.split("/")
-                if (parts.size == 3) {
-                    val m = parts[1].toIntOrNull()
-                    val y = parts[2].toIntOrNull()
-                    m == mesAtual && y == anoAtual
-                } else {
-                    false
-                }
-            }
-
-        val totalReceitas =
-            transacoesDoMes.filter { it.isReceita }.sumOf { parseValor(it.valor) }
-        val totalDespesasPagas = transacoesDoMes.filter { !it.isReceita && it.isPago }
-            .sumOf { parseValor(it.valor) }
-        val totalDespesasAberto = transacoesDoMes.filter { !it.isReceita && !it.isPago }
-            .sumOf { parseValor(it.valor) }
-
-        val saldoMes = totalReceitas - totalDespesasPagas - totalDespesasAberto
-
-
-        NavHost(
-            navController = navController,
-            startDestination = LoginRoute,
+fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
+    GestFinTheme(darkTheme = darkTheme) {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background,
         ) {
-            composable<LoginRoute> {
-                LoginScreen(
-                    onEntrar = {
-                        navController.navigate(DashboardRoute)
-                    },
-                    onRegister = {
-                        navController.navigate(RegisterRoute)
-                    }
+            val navController = rememberNavController()
+
+            var transacoes by remember {
+                mutableStateOf(
+                    listOf(
+                        Transacao(
+                            "1",
+                            "3.000,00",
+                            true,
+                            "01/10/2026",
+                            "Salário",
+                            "Pix",
+                            "Pagamento mensal",
+                            true,
+                        ),
+                        Transacao(
+                            "2",
+                            "450,00",
+                            false,
+                            "05/10/2026",
+                            "Alimentação",
+                            "Cartão de Crédito",
+                            "Supermercado",
+                            true,
+                        ),
+                    ),
                 )
             }
 
-            composable<RegisterRoute> {
-                RegisterScreen(
-                    onRegister = {
-                        println("oi")
-                    },
-                    onVoltar = {
-                        navController.navigate(LoginRoute)
-                    }
+            var mesAtual by remember { mutableStateOf(10) }
+            var anoAtual by remember { mutableStateOf(2026) }
+
+            val mesesNomes =
+                listOf(
+                    "",
+                    "Janeiro",
+                    "Fevereiro",
+                    "Março",
+                    "Abril",
+                    "Maio",
+                    "Junho",
+                    "Julho",
+                    "Agosto",
+                    "Setembro",
+                    "Outubro",
+                    "Novembro",
+                    "Dezembro",
                 )
-            }
 
-            composable<DashboardRoute> {
-                DashboardScreen(
-                    mesAtualNome = "${mesesNomes[mesAtual]} $anoAtual",
-                    onMesAnterior = {
-                        if (mesAtual == 1) {
-                            mesAtual = 12
-                            anoAtual--
-                        } else {
-                            mesAtual--
-                        }
-                    },
-                    onProximoMes = {
-                        if (mesAtual == 12) {
-                            mesAtual = 1
-                            anoAtual++
-                        } else {
-                            mesAtual++
-                        }
-                    },
-                    saldoEstimado = formatarValor(saldoMes),
-                    receitas = formatarValor(totalReceitas),
-                    despesasPagas = formatarValor(totalDespesasPagas),
-                    despesasAberto = formatarValor(totalDespesasAberto),
-                    transacoes = transacoesDoMes,
-                    onNovaTransacao = {
-                        navController.navigate(NovaTransacaoRoute)
-                    },
-                    )
-            }
+            // Filtra transações do mês
+            val transacoesDoMes =
+                transacoes.filter {
+                    val parts = it.data.split("/")
+                    if (parts.size == 3) {
+                        val m = parts[1].toIntOrNull()
+                        val y = parts[2].toIntOrNull()
+                        m == mesAtual && y == anoAtual
+                    } else {
+                        false
+                    }
+                }
 
-            composable<NovaTransacaoRoute> {
-                NovaTransacaoScreen(
-                    onSalvar = { novaTransacao ->
-                        transacoes = listOf(novaTransacao) + transacoes
-                        navController.popBackStack()
-                    },
-                    onCancelar = {
-                        navController.popBackStack()
-                    },
+            val totalReceitas =
+                transacoesDoMes.filter { it.isReceita }.sumOf { parseValor(it.valor) }
+            val totalDespesasPagas =
+                transacoesDoMes
+                    .filter { !it.isReceita && it.isPago }
+                    .sumOf { parseValor(it.valor) }
+            val totalDespesasAberto =
+                transacoesDoMes
+                    .filter { !it.isReceita && !it.isPago }
+                    .sumOf { parseValor(it.valor) }
+
+            val saldoMes = totalReceitas - totalDespesasPagas - totalDespesasAberto
+
+            NavHost(
+                navController = navController,
+                startDestination = LoginRoute,
+            ) {
+                composable<LoginRoute> {
+                    LoginScreen(
+                        onEntrar = {
+                            navController.navigate(DashboardRoute)
+                        },
+                        onRegister = {
+                            navController.navigate(RegisterRoute)
+                        },
                     )
+                }
+
+                composable<RegisterRoute> {
+                    RegisterScreen(
+                        onRegister = {
+                            println("oi")
+                        },
+                        onVoltar = {
+                            navController.navigate(LoginRoute)
+                        },
+                    )
+                }
+
+                composable<DashboardRoute> {
+                    DashboardScreen(
+                        mesAtualNome = "${mesesNomes[mesAtual]} $anoAtual",
+                        onMesAnterior = {
+                            if (mesAtual == 1) {
+                                mesAtual = 12
+                                anoAtual--
+                            } else {
+                                mesAtual--
+                            }
+                        },
+                        onProximoMes = {
+                            if (mesAtual == 12) {
+                                mesAtual = 1
+                                anoAtual++
+                            } else {
+                                mesAtual++
+                            }
+                        },
+                        saldoEstimado = formatarValor(saldoMes),
+                        receitas = formatarValor(totalReceitas),
+                        despesasPagas = formatarValor(totalDespesasPagas),
+                        despesasAberto = formatarValor(totalDespesasAberto),
+                        transacoes = transacoesDoMes,
+                        onNovaTransacao = {
+                            navController.navigate(NovaTransacaoRoute)
+                        },
+                    )
+                }
+
+                composable<NovaTransacaoRoute> {
+                    NovaTransacaoScreen(
+                        onSalvar = { novaTransacao ->
+                            transacoes = listOf(novaTransacao) + transacoes
+                            navController.popBackStack()
+                        },
+                        onCancelar = {
+                            navController.popBackStack()
+                        },
+                    )
+                }
             }
         }
     }
+}
+
+@Preview
+@Composable
+@Suppress("FunctionNaming", "ktlint:standard:function-naming")
+fun AppLightPreview() {
+    App(darkTheme = false)
+}
+
+@Preview
+@Composable
+@Suppress("FunctionNaming", "ktlint:standard:function-naming")
+fun AppDarkPreview() {
+    App(darkTheme = true)
 }
