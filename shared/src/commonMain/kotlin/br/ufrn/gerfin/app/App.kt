@@ -8,12 +8,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import br.ufrn.gerfin.app.data.login
+import br.ufrn.gerfin.app.data.register
+import br.ufrn.gerfin.app.exception.CadastroException
 import br.ufrn.gerfin.app.model.Transacao
 import br.ufrn.gerfin.app.navigation.DashboardRoute
 import br.ufrn.gerfin.app.navigation.LoginRoute
@@ -24,6 +28,7 @@ import br.ufrn.gerfin.app.ui.screens.LoginScreen
 import br.ufrn.gerfin.app.ui.screens.NovaTransacaoScreen
 import br.ufrn.gerfin.app.ui.screens.RegisterScreen
 import br.ufrn.gerfin.app.ui.theme.GestFinTheme
+import kotlinx.coroutines.launch
 import kotlin.math.round
 
 private fun parseValor(valorStr: String): Double {
@@ -53,6 +58,8 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
             color = MaterialTheme.colorScheme.background,
         ) {
             val navController = rememberNavController()
+            val scope = rememberCoroutineScope()
+            var mensagemErro by remember { mutableStateOf<String?>(null) }
 
             var transacoes by remember {
                 mutableStateOf(
@@ -133,8 +140,21 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
             ) {
                 composable<LoginRoute> {
                     LoginScreen(
-                        onEntrar = {
-                            navController.navigate(DashboardRoute)
+                        mensagemErro = mensagemErro,
+                        onEntrar = { email, senha ->
+                            scope.launch {
+                                try {
+                                    login(email, senha)
+                                    navController.navigate(DashboardRoute)
+                                } catch (e: Exception) {
+                                    mensagemErro =
+                                        if (e is CadastroException) {
+                                            e.message
+                                        } else {
+                                            "Não foi possível fazer login."
+                                        }
+                                }
+                            }
                         },
                         onRegister = {
                             navController.navigate(RegisterRoute)
@@ -144,8 +164,30 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
 
                 composable<RegisterRoute> {
                     RegisterScreen(
-                        onRegister = {
-                            println("oi")
+                        mensagemErro = mensagemErro,
+                        onRegister = { email, senha01, senha02 ->
+                            scope.launch {
+                                try {
+                                    if (email.isBlank()) {
+                                        throw CadastroException("Informe o e-mail.")
+                                    }
+                                    if (senha01.isBlank()) {
+                                        throw CadastroException("Informe a senha.")
+                                    }
+                                    if (senha02.isBlank()) {
+                                        throw CadastroException("Informe a confirmação da senha.")
+                                    }
+                                    register(email, senha01, senha02)
+                                    navController.popBackStack()
+                                } catch (e: Exception) {
+                                    mensagemErro =
+                                        if (e is CadastroException) {
+                                            e.message
+                                        } else {
+                                            "Não foi possível realizar o cadastro."
+                                        }
+                                }
+                            }
                         },
                         onVoltar = {
                             navController.navigate(LoginRoute)
