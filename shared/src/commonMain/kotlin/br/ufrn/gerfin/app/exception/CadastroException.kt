@@ -1,5 +1,5 @@
 package br.ufrn.gerfin.app.exception
 
 class CadastroException(
-    mensagem: String
+    mensagem: String,
 ) : Exception(mensagem)
