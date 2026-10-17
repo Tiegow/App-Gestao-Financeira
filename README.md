@@ -15,7 +15,7 @@ Aplicativo Kotlin Multiplatform de gestão financeira pessoal. O alvo principal 
 
 ### Acessibilidade e deep link
 
-Os ícones de navegação por mês, seleção de data e retorno têm descrições de ação. O grupo informou que não realizou teste com TalkBack; esse requisito permanece pendente. Não há deep link implementado no estado documentado; portanto não há comando de demonstração disponível. As demais limitações estão no registro da sprint.
+Os ícones de navegação por mês, seleção de data e retorno têm descrições de ação. O teste com TalkBack não foi realizado. O deep link não foi implementado. As demais limitações estão no registro da sprint.
 
 ## Estrutura e execução
 

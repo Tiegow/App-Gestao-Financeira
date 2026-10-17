@@ -15,9 +15,9 @@ Este documento registra o estado observado no código e as evidências ainda nec
 
 | Item | Registro |
 |---|---|
-| Vídeo da Sprint 1 | [Apresentação no YouTube](https://www.youtube.com/watch?v=aF9qTKWK3j4), link fornecido pelo integrante |
-| Demonstração de duas larguras | Conteúdo do vídeo ainda não conferido |
-| Teste com TalkBack | Não realizado, conforme informado pelo integrante |
+| Vídeo da Sprint 1 | [Apresentação no YouTube](https://www.youtube.com/watch?v=aF9qTKWK3j4) |
+| Demonstração de duas larguras | Não verificada no vídeo |
+| Teste com TalkBack | Não realizado |
 | CI na branch principal | Conferir no GitHub após integrar os PRs |
 | PRs, revisões e cartões | Conferir no quadro e no histórico do GitHub |
 
@@ -28,7 +28,7 @@ Este documento registra o estado observado no código e as evidências ainda nec
 - Faltam previews específicos de todas as telas, incluindo estado vazio.
 - Não foram identificadas marcações de títulos com `heading()`.
 - O botão de adicionar lançamento usa o texto “+”, sem um nome de ação acessível explícito.
-- O grupo não realizou teste com TalkBack. As descrições existentes nos ícones não comprovam um teste com leitor de tela.
+- O teste com TalkBack não foi realizado.
 
 Essas lacunas pertencem à rubrica da Sprint 1. Registrar aqui não significa que foram atendidas ou que seu adiamento foi autorizado.
 
