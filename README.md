@@ -1,3 +1,24 @@
+# GestFin — Gestão Financeira
+
+Aplicativo Kotlin Multiplatform de gestão financeira pessoal. O alvo principal da proposta é Android; o projeto também contém alvos iOS e Desktop (JVM).
+
+## Entrega da Sprint 1
+
+- [Registro da entrega, evidências e limitações](docs/sprint-1.md)
+- [Proposta do produto e equipe](docs/proposta.md)
+- [Registro de uso de IA](docs/uso-de-ia.md)
+- [Workflow de integração contínua](https://github.com/Tiegow/App-Gestao-Financeira/actions)
+
+### Vídeo
+
+[Assistir ao vídeo de apresentação da Sprint 1](https://www.youtube.com/watch?v=aF9qTKWK3j4).
+
+### Acessibilidade e deep link
+
+Os ícones de navegação por mês, seleção de data e retorno têm descrições de ação. O grupo informou que não realizou teste com TalkBack; esse requisito permanece pendente. Não há deep link implementado no estado documentado; portanto não há comando de demonstração disponível. As demais limitações estão no registro da sprint.
+
+## Estrutura e execução
+
 This is a Kotlin Multiplatform project targeting Android, iOS, Desktop (JVM).
 
 * [/iosApp](./iosApp/iosApp) contains an iOS application. Even if you’re sharing your UI with Compose Multiplatform,
