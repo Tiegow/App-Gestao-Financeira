@@ -27,19 +27,9 @@ Este documento registra o estado observado no código e as evidências ainda nec
 - Não foi identificada adaptação por `currentWindowAdaptiveInfo().windowSizeClass`.
 - Faltam previews específicos de todas as telas, incluindo estado vazio.
 - Não foram identificadas marcações de títulos com `heading()`.
-- O botão de adicionar lançamento usa o texto “+”, sem um nome de ação acessível explícito.
 - O teste com TalkBack não foi realizado.
-
-Essas lacunas pertencem à rubrica da Sprint 1. Registrar aqui não significa que foram atendidas ou que seu adiamento foi autorizado.
 
 ## Continuidade do projeto
 
 Conectar leitura e escrita de lançamentos ao Supabase, associar os registros ao usuário autenticado e evoluir a organização do estado com ViewModel. Persistência, rede e testes de interface são conteúdo previsto para a Sprint 2 nos requisitos fornecidos.
 
-## Fechamento
-
-- O link do vídeo está no README; verificar que ele abre para outra pessoa.
-- Conferir o roteiro: telas, Voltar, deep link, duas larguras, leitor de tela, CI e próximos passos; todos os integrantes devem falar.
-- Registrar somente testes e ajustes de acessibilidade efetivamente realizados.
-- Vincular o PR ao cartão correspondente e solicitar revisão de outro integrante.
-- Integrar na branch principal e conferir o workflow completo antes do prazo.
