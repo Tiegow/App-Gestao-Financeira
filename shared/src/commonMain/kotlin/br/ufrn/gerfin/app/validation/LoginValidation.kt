@@ -2,9 +2,9 @@ package br.ufrn.gerfin.app.validation
 
 import br.ufrn.gerfin.app.exception.CadastroException
 
-fun  validarLogin(
+fun validarLogin(
     email: String,
-    senha: String
+    senha: String,
 ) {
     if (email.isBlank()) {
         throw CadastroException("Você deve informar o e-mail!")
