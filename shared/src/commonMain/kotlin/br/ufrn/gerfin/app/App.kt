@@ -151,12 +151,13 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
                                         if (e is CadastroException) {
                                             e.message
                                         } else {
-                                            "Não foi possível fazer login."
+                                            "Não foi possível realizar o login!"
                                         }
                                 }
                             }
                         },
                         onRegister = {
+                            mensagemErro = ""
                             navController.navigate(RegisterRoute)
                         },
                     )
@@ -168,15 +169,6 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
                         onRegister = { email, senha01, senha02 ->
                             scope.launch {
                                 try {
-                                    if (email.isBlank()) {
-                                        throw CadastroException("Informe o e-mail.")
-                                    }
-                                    if (senha01.isBlank()) {
-                                        throw CadastroException("Informe a senha.")
-                                    }
-                                    if (senha02.isBlank()) {
-                                        throw CadastroException("Informe a confirmação da senha.")
-                                    }
                                     register(email, senha01, senha02)
                                     navController.popBackStack()
                                 } catch (e: Exception) {
@@ -184,12 +176,13 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
                                         if (e is CadastroException) {
                                             e.message
                                         } else {
-                                            "Não foi possível realizar o cadastro."
+                                            "Não foi possível realizar o cadastro!"
                                         }
                                 }
                             }
                         },
                         onVoltar = {
+                            mensagemErro = ""
                             navController.navigate(LoginRoute)
                         },
                     )

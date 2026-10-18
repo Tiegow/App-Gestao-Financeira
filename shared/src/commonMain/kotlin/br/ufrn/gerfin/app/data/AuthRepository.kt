@@ -1,6 +1,7 @@
 package br.ufrn.gerfin.app.data
 
-import br.ufrn.gerfin.app.exception.CadastroException
+import br.ufrn.gerfin.app.validation.validarLogin
+import br.ufrn.gerfin.app.validation.validarRegistro
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 
@@ -8,6 +9,8 @@ suspend fun login(
     emailDigitado: String,
     senhaDigitada: String,
 ) {
+    validarLogin(emailDigitado, senhaDigitada)
+
     supabase.auth.signInWith(Email) {
         email = emailDigitado
         password = senhaDigitada
@@ -19,9 +22,7 @@ suspend fun register(
     senhaDigitada01: String,
     senhaDigitada02: String,
 ) {
-    if (senhaDigitada01 != senhaDigitada02) {
-        throw CadastroException("As senhas devem ser iguais!")
-    }
+    validarRegistro(emailDigitado, senhaDigitada01, senhaDigitada02)
 
     supabase.auth.signUpWith(Email) {
         email = emailDigitado
