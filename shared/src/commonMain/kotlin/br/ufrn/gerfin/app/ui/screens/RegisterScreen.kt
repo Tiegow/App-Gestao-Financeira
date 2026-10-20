@@ -83,11 +83,12 @@ fun RegisterScreen(
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        onRegister(email, senha01, senha02)
-                    },
-                ),
+                keyboardActions =
+                    KeyboardActions(
+                        onDone = {
+                            onRegister(email, senha01, senha02)
+                        },
+                    ),
             )
 
             Button(
