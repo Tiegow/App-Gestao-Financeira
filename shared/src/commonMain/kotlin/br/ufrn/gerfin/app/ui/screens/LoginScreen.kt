@@ -61,11 +61,12 @@ fun LoginScreen(
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    onEntrar(email, senha)
-                },
-            ),
+            keyboardActions =
+                KeyboardActions(
+                    onDone = {
+                        onEntrar(email, senha)
+                    },
+                ),
         )
 
         Button(
