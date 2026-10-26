@@ -14,7 +14,7 @@ import kotlin.math.round
 
 fun Transacao.toInsertDto(
     usuarioId: String,
-    categorias: List<CategoriaDto>
+    categorias: List<CategoriaDto>,
 ): LancamentoInsertDto {
     val tipoCategoria = if (isReceita) TipoCategoria.RECEITA else TipoCategoria.DESPESA
 

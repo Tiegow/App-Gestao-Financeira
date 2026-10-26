@@ -21,7 +21,6 @@ import br.ufrn.gerfin.app.data.login
 import br.ufrn.gerfin.app.data.register
 import br.ufrn.gerfin.app.data.supabase
 import br.ufrn.gerfin.app.exception.CadastroException
-import br.ufrn.gerfin.app.model.Transacao
 import br.ufrn.gerfin.app.navigation.DashboardRoute
 import br.ufrn.gerfin.app.navigation.LoginRoute
 import br.ufrn.gerfin.app.navigation.NovaTransacaoRoute
@@ -31,12 +30,11 @@ import br.ufrn.gerfin.app.ui.screens.LoginScreen
 import br.ufrn.gerfin.app.ui.screens.NovaTransacaoScreen
 import br.ufrn.gerfin.app.ui.screens.RegisterScreen
 import br.ufrn.gerfin.app.ui.theme.GestFinTheme
-import kotlinx.coroutines.launch
-import kotlin.math.round
 import br.ufrn.gerfin.app.ui.viewmodel.LancamentosViewModel
-import io.github.jan.supabase.auth.auth
-import kotlin.coroutines.cancellation.CancellationException
 import br.ufrn.gerfin.app.utils.formatarValor
+import io.github.jan.supabase.auth.auth
+import kotlinx.coroutines.launch
+import kotlin.coroutines.cancellation.CancellationException
 
 private fun parseValor(valorStr: String): Double {
     val limpo = valorStr.replace(".", "").replace(",", ".")
@@ -55,9 +53,10 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
             val scope = rememberCoroutineScope()
             var mensagemErro by remember { mutableStateOf<String?>(null) }
 
-            val lancamentoView: LancamentosViewModel = viewModel {
-                LancamentosViewModel()
-            }
+            val lancamentoView: LancamentosViewModel =
+                viewModel {
+                    LancamentosViewModel()
+                }
             val transacoes = lancamentoView.transacoes
 
             var mesAtual by remember { mutableStateOf(10) }
@@ -202,8 +201,9 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
                         onSalvar = { novaTransacao ->
                             scope.launch {
                                 try {
-                                    val usuarioId = supabase.auth.currentUserOrNull()?.id
-                                        ?: error("Usuário não autenticado")
+                                    val usuarioId =
+                                        supabase.auth.currentUserOrNull()?.id
+                                            ?: error("Usuário não autenticado")
 
                                     lancamentoView.salvarLancamento(usuarioId, novaTransacao)
                                     navController.popBackStack()

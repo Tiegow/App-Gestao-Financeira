@@ -12,16 +12,18 @@ fun formatarValor(valor: Double): String {
     val sinal = if (totalCentavos < 0) "-" else ""
     val absoluto = kotlin.math.abs(totalCentavos)
 
-    val reais = (absoluto / 100)
-        .toString()
-        .reversed()
-        .chunked(3)
-        .joinToString(".")
-        .reversed()
+    val reais =
+        (absoluto / 100)
+            .toString()
+            .reversed()
+            .chunked(3)
+            .joinToString(".")
+            .reversed()
 
-    val centavos = (absoluto % 100)
-        .toString()
-        .padStart(2, '0')
+    val centavos =
+        (absoluto % 100)
+            .toString()
+            .padStart(2, '0')
 
     return "$sinal$reais,$centavos"
 }
