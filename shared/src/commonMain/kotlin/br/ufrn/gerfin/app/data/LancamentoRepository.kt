@@ -8,11 +8,14 @@ import io.github.jan.supabase.postgrest.query.Order
 class LancamentoRepository(
     private val client: SupabaseClient = supabase,
 ) {
-    suspend fun listar(): List<LancamentoDto> =
+    suspend fun listar(usuarioId: String): List<LancamentoDto> =
         client
             .from("Lancamentos")
             .select {
-                filter { eq("faturavel", true) }
+                filter {
+                    eq("faturavel", true)
+                    eq("pessoa_id", usuarioId)
+                }
                 order("data_competencia", Order.DESCENDING)
             }.decodeList()
 

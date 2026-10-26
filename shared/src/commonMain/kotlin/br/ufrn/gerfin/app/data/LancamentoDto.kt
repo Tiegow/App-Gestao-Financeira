@@ -6,7 +6,6 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/** Linha lida do banco. */
 @Serializable
 data class LancamentoDto(
     val id: Int,
@@ -23,7 +22,6 @@ data class LancamentoDto(
     val descricao: String? = null,
 )
 
-/** Dados enviados ao inserir (sem id e sem pessoa_id). */
 @Serializable
 data class LancamentoInsertDto(
     val valor: Int,
@@ -32,6 +30,7 @@ data class LancamentoInsertDto(
     val recorrente: Boolean,
     @SerialName("data_competencia") val dataCompetencia: Instant,
     val pago: Boolean,
+    @SerialName("pessoa_id") val pessoaId: String,
     val tipo: TipoLancamento,
     @SerialName("forma_pagamento") val formaPagamento: FormaPagamento?,
     @SerialName("categoria_id") val categoriaId: Int,

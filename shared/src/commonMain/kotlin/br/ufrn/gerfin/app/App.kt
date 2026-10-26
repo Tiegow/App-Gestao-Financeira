@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import br.ufrn.gerfin.app.data.login
 import br.ufrn.gerfin.app.data.register
+import br.ufrn.gerfin.app.data.supabase
 import br.ufrn.gerfin.app.exception.CadastroException
 import br.ufrn.gerfin.app.model.Transacao
 import br.ufrn.gerfin.app.navigation.DashboardRoute
@@ -30,23 +32,14 @@ import br.ufrn.gerfin.app.ui.screens.RegisterScreen
 import br.ufrn.gerfin.app.ui.theme.GestFinTheme
 import kotlinx.coroutines.launch
 import kotlin.math.round
+import br.ufrn.gerfin.app.ui.viewmodel.LancamentosViewModel
+import io.github.jan.supabase.auth.auth
+import kotlin.coroutines.cancellation.CancellationException
+import br.ufrn.gerfin.app.utils.formatarValor
 
 private fun parseValor(valorStr: String): Double {
     val limpo = valorStr.replace(".", "").replace(",", ".")
     return limpo.toDoubleOrNull() ?: 0.0
-}
-
-private fun formatarValor(valor: Double): String {
-    val intPart = valor.toLong()
-    val cents = round((valor - intPart) * 100).toInt().toString().padStart(2, '0')
-    val intFormatado =
-        intPart
-            .toString()
-            .reversed()
-            .chunked(3)
-            .joinToString(".")
-            .reversed()
-    return "$intFormatado,$cents"
 }
 
 @Composable
@@ -61,31 +54,10 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
             val scope = rememberCoroutineScope()
             var mensagemErro by remember { mutableStateOf<String?>(null) }
 
+            val lancamentoView = remember { LancamentosViewModel() }
+
             var transacoes by remember {
-                mutableStateOf(
-                    listOf(
-                        Transacao(
-                            "1",
-                            "3.000,00",
-                            true,
-                            "01/10/2026",
-                            "Salário",
-                            "Pix",
-                            "Pagamento mensal",
-                            true,
-                        ),
-                        Transacao(
-                            "2",
-                            "450,00",
-                            false,
-                            "05/10/2026",
-                            "Alimentação",
-                            "Cartão de Crédito",
-                            "Supermercado",
-                            true,
-                        ),
-                    ),
-                )
+                mutableStateOf<List<Transacao>>(emptyList())
             }
 
             var mesAtual by remember { mutableStateOf(10) }
@@ -189,6 +161,21 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
                 }
 
                 composable<DashboardRoute> {
+                    val usuarioId = supabase.auth.currentUserOrNull()?.id
+
+                    LaunchedEffect(usuarioId) {
+                        transacoes = emptyList()
+
+                        if (usuarioId != null) {
+                            try {
+                                transacoes = lancamentoView.listarLancamentos(usuarioId)
+                            } catch (e: CancellationException) {
+                                throw e
+                            } catch (e: Exception) {
+                                mensagemErro = "Não foi possível carregar os lançamentos."
+                            }
+                        }
+                    }
                     DashboardScreen(
                         mesAtualNome = "${mesesNomes[mesAtual]} $anoAtual",
                         onMesAnterior = {

@@ -12,7 +12,10 @@ import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 import kotlin.math.round
 
-fun Transacao.toInsertDto(categorias: List<CategoriaDto>): LancamentoInsertDto {
+fun Transacao.toInsertDto(
+    usuarioId: String,
+    categorias: List<CategoriaDto>
+): LancamentoInsertDto {
     val tipoCategoria = if (isReceita) TipoCategoria.RECEITA else TipoCategoria.DESPESA
 
     val categoriaId =
@@ -27,6 +30,7 @@ fun Transacao.toInsertDto(categorias: List<CategoriaDto>): LancamentoInsertDto {
         lancamentoId = null,
         faturavel = true,
         recorrente = false,
+        pessoaId = usuarioId,
         dataCompetencia = LocalDate(ano, mes, dia).atStartOfDayIn(TimeZone.UTC),
         pago = isPago,
         tipo = if (isReceita) TipoLancamento.RECEITA_SIMPLES else TipoLancamento.DESPESA_SIMPLES,
