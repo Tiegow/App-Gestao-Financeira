@@ -13,6 +13,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -54,11 +55,10 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
             val scope = rememberCoroutineScope()
             var mensagemErro by remember { mutableStateOf<String?>(null) }
 
-            val lancamentoView = remember { LancamentosViewModel() }
-
-            var transacoes by remember {
-                mutableStateOf<List<Transacao>>(emptyList())
+            val lancamentoView: LancamentosViewModel = viewModel {
+                LancamentosViewModel()
             }
+            val transacoes = lancamentoView.transacoes
 
             var mesAtual by remember { mutableStateOf(10) }
             var anoAtual by remember { mutableStateOf(2026) }
@@ -164,11 +164,9 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
                     val usuarioId = supabase.auth.currentUserOrNull()?.id
 
                     LaunchedEffect(usuarioId) {
-                        transacoes = emptyList()
-
                         if (usuarioId != null) {
                             try {
-                                transacoes = lancamentoView.listarLancamentos(usuarioId)
+                                lancamentoView.listarLancamentos(usuarioId)
                             } catch (e: CancellationException) {
                                 throw e
                             } catch (e: Exception) {
@@ -208,8 +206,19 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
                 composable<NovaTransacaoRoute> {
                     NovaTransacaoScreen(
                         onSalvar = { novaTransacao ->
-                            transacoes = listOf(novaTransacao) + transacoes
-                            navController.popBackStack()
+                            scope.launch {
+                                try {
+                                    val usuarioId = supabase.auth.currentUserOrNull()?.id
+                                        ?: error("Usuário não autenticado")
+
+                                    lancamentoView.salvarLancamento(usuarioId, novaTransacao)
+                                    navController.popBackStack()
+                                } catch (e: CancellationException) {
+                                    throw e
+                                } catch (e: Exception) {
+                                    mensagemErro = "Não foi possível salvar o lançamento."
+                                }
+                            }
                         },
                         onCancelar = {
                             navController.popBackStack()
