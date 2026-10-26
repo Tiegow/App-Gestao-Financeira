@@ -165,13 +165,7 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
 
                     LaunchedEffect(usuarioId) {
                         if (usuarioId != null) {
-                            try {
-                                lancamentoView.listarLancamentos(usuarioId)
-                            } catch (e: CancellationException) {
-                                throw e
-                            } catch (e: Exception) {
-                                mensagemErro = "Não foi possível carregar os lançamentos."
-                            }
+                            lancamentoView.listarLancamentos(usuarioId)
                         }
                     }
                     DashboardScreen(
