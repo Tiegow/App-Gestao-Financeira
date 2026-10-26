@@ -8,14 +8,22 @@ fun parseValor(valorStr: String): Double {
 }
 
 fun formatarValor(valor: Double): String {
-    val intPart = valor.toLong()
-    val cents = round((valor - intPart) * 100).toInt().toString().padStart(2, '0')
-    val intFormatado =
-        intPart
+    val totalCentavos = round(valor * 100).toLong()
+    val sinal = if (totalCentavos < 0) "-" else ""
+    val absoluto = kotlin.math.abs(totalCentavos)
+
+    val reais =
+        (absoluto / 100)
             .toString()
             .reversed()
             .chunked(3)
             .joinToString(".")
             .reversed()
-    return "$intFormatado,$cents"
+
+    val centavos =
+        (absoluto % 100)
+            .toString()
+            .padStart(2, '0')
+
+    return "$sinal$reais,$centavos"
 }

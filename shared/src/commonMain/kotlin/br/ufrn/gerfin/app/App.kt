@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -12,13 +13,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import br.ufrn.gerfin.app.data.login
 import br.ufrn.gerfin.app.data.register
+import br.ufrn.gerfin.app.data.supabase
 import br.ufrn.gerfin.app.exception.CadastroException
-import br.ufrn.gerfin.app.model.Transacao
 import br.ufrn.gerfin.app.navigation.DashboardRoute
 import br.ufrn.gerfin.app.navigation.LoginRoute
 import br.ufrn.gerfin.app.navigation.NovaTransacaoRoute
@@ -28,25 +30,15 @@ import br.ufrn.gerfin.app.ui.screens.LoginScreen
 import br.ufrn.gerfin.app.ui.screens.NovaTransacaoScreen
 import br.ufrn.gerfin.app.ui.screens.RegisterScreen
 import br.ufrn.gerfin.app.ui.theme.GestFinTheme
+import br.ufrn.gerfin.app.ui.viewmodel.LancamentosViewModel
+import br.ufrn.gerfin.app.utils.formatarValor
+import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.launch
-import kotlin.math.round
+import kotlin.coroutines.cancellation.CancellationException
 
 private fun parseValor(valorStr: String): Double {
     val limpo = valorStr.replace(".", "").replace(",", ".")
     return limpo.toDoubleOrNull() ?: 0.0
-}
-
-private fun formatarValor(valor: Double): String {
-    val intPart = valor.toLong()
-    val cents = round((valor - intPart) * 100).toInt().toString().padStart(2, '0')
-    val intFormatado =
-        intPart
-            .toString()
-            .reversed()
-            .chunked(3)
-            .joinToString(".")
-            .reversed()
-    return "$intFormatado,$cents"
 }
 
 @Composable
@@ -61,32 +53,11 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
             val scope = rememberCoroutineScope()
             var mensagemErro by remember { mutableStateOf<String?>(null) }
 
-            var transacoes by remember {
-                mutableStateOf(
-                    listOf(
-                        Transacao(
-                            "1",
-                            "3.000,00",
-                            true,
-                            "01/10/2026",
-                            "Salário",
-                            "Pix",
-                            "Pagamento mensal",
-                            true,
-                        ),
-                        Transacao(
-                            "2",
-                            "450,00",
-                            false,
-                            "05/10/2026",
-                            "Alimentação",
-                            "Cartão de Crédito",
-                            "Supermercado",
-                            true,
-                        ),
-                    ),
-                )
-            }
+            val lancamentoView: LancamentosViewModel =
+                viewModel {
+                    LancamentosViewModel()
+                }
+            val transacoes = lancamentoView.transacoes
 
             var mesAtual by remember { mutableStateOf(10) }
             var anoAtual by remember { mutableStateOf(2026) }
@@ -189,6 +160,13 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
                 }
 
                 composable<DashboardRoute> {
+                    val usuarioId = supabase.auth.currentUserOrNull()?.id
+
+                    LaunchedEffect(usuarioId) {
+                        if (usuarioId != null) {
+                            lancamentoView.listarLancamentos(usuarioId)
+                        }
+                    }
                     DashboardScreen(
                         mesAtualNome = "${mesesNomes[mesAtual]} $anoAtual",
                         onMesAnterior = {
@@ -221,8 +199,20 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
                 composable<NovaTransacaoRoute> {
                     NovaTransacaoScreen(
                         onSalvar = { novaTransacao ->
-                            transacoes = listOf(novaTransacao) + transacoes
-                            navController.popBackStack()
+                            scope.launch {
+                                try {
+                                    val usuarioId =
+                                        supabase.auth.currentUserOrNull()?.id
+                                            ?: error("Usuário não autenticado")
+
+                                    lancamentoView.salvarLancamento(usuarioId, novaTransacao)
+                                    navController.popBackStack()
+                                } catch (e: CancellationException) {
+                                    throw e
+                                } catch (e: Exception) {
+                                    mensagemErro = "Não foi possível salvar o lançamento."
+                                }
+                            }
                         },
                         onCancelar = {
                             navController.popBackStack()
