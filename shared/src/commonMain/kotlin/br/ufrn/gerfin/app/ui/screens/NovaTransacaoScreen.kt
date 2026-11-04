@@ -28,6 +28,8 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import br.ufrn.gerfin.app.data.CategoriaDto
+import br.ufrn.gerfin.app.model.TipoCategoria
 import br.ufrn.gerfin.app.model.Transacao
 import br.ufrn.gerfin.app.ui.components.CampoData
 import br.ufrn.gerfin.app.ui.components.CampoDropdown
@@ -36,6 +38,7 @@ import br.ufrn.gerfin.app.ui.components.CampoMoeda
 @Composable
 @Suppress("FunctionNaming", "ktlint:standard:function-naming", "LongMethod")
 fun NovaTransacaoScreen(
+    categorias: List<CategoriaDto>,
     onSalvar: (Transacao) -> Unit,
     onCancelar: () -> Unit,
 ) {
@@ -50,9 +53,17 @@ fun NovaTransacaoScreen(
 
     var isPago by remember { mutableStateOf(true) }
 
-    val categoriasDespesa = listOf("Alimentação", "Moradia", "Transporte", "Saúde", "Lazer", "Outros")
-    val categoriasReceita = listOf("Salário", "Rendimentos", "Vendas", "Outros")
-    val opcoesCategoria = if (isReceita) categoriasReceita else categoriasDespesa
+    val tipoCategoria =
+        if (isReceita) {
+            TipoCategoria.RECEITA
+        } else {
+            TipoCategoria.DESPESA
+        }
+
+    val opcoesCategoria =
+        categorias
+            .filter { it.tipo == tipoCategoria }
+            .map { it.nome }
 
     val formasPagamento = listOf("Dinheiro", "Pix", "Cartão de Crédito", "Cartão de Débito", "Boleto")
 
