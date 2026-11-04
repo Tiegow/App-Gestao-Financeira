@@ -17,6 +17,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import br.ufrn.gerfin.app.data.CategoriaDto
+import br.ufrn.gerfin.app.data.LancamentoRepository
 import br.ufrn.gerfin.app.data.login
 import br.ufrn.gerfin.app.data.register
 import br.ufrn.gerfin.app.data.supabase
@@ -78,6 +80,12 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
                     "Novembro",
                     "Dezembro",
                 )
+
+            var categorias by remember {
+                mutableStateOf<List<CategoriaDto>>(emptyList())
+            }
+
+            val repository = remember { LancamentoRepository() }
 
             // Filtra transações do mês
             val transacoesDoMes =
@@ -197,7 +205,17 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
                 }
 
                 composable<NovaTransacaoRoute> {
+                    LaunchedEffect(Unit) {
+                        try {
+                            categorias = repository.categorias()
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (e: Exception) {
+                            println("Erro meu chapa.")
+                        }
+                    }
                     NovaTransacaoScreen(
+                        categorias = categorias,
                         onSalvar = { novaTransacao ->
                             scope.launch {
                                 try {
