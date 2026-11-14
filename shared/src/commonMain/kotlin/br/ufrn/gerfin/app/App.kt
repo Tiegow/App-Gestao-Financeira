@@ -33,7 +33,6 @@ import br.ufrn.gerfin.app.ui.screens.NovaTransacaoScreen
 import br.ufrn.gerfin.app.ui.screens.RegisterScreen
 import br.ufrn.gerfin.app.ui.theme.GestFinTheme
 import br.ufrn.gerfin.app.ui.viewmodel.LancamentosViewModel
-import br.ufrn.gerfin.app.data.LancamentoRepository
 import br.ufrn.gerfin.app.utils.formatarValor
 import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.launch

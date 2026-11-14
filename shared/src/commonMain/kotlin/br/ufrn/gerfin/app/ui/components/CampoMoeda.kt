@@ -7,6 +7,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -36,7 +37,7 @@ fun CampoMoeda(
         },
         label = { Text("Valor") },
         prefix = { Text("R$ ") },
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.testTag("campo-valor").fillMaxWidth(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.End),
         singleLine = true,

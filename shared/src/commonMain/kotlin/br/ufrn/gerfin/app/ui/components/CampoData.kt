@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 
 @Preview
@@ -47,7 +48,7 @@ fun CampoData(
         onValueChange = { },
         readOnly = true,
         label = { Text("Data") },
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.testTag("campo-data").fillMaxWidth(),
         isError = isErro,
         supportingText = { if (isErro) Text("Selecione uma data") },
         trailingIcon = {

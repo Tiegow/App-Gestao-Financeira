@@ -13,6 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,7 +30,11 @@ fun CampoDropdown(
     ExposedDropdownMenuBox(
         expanded = expandido,
         onExpandedChange = { expandido = it },
-        modifier = modifier,
+        modifier =
+            modifier
+                .testTag(
+                    "campo-${label.lowercase().replace(" ", "-")}",
+                ),
     ) {
         OutlinedTextField(
             value = selecionado,

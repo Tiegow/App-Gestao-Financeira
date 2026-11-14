@@ -41,12 +41,13 @@ fun NovaTransacaoScreen(
     categorias: List<CategoriaDto>,
     onSalvar: (Transacao) -> Unit,
     onCancelar: () -> Unit,
+    initialData: String = "",
 ) {
     val scrollState = rememberScrollState()
 
     var isReceita by remember { mutableStateOf(false) }
     var valorTextField by remember { mutableStateOf(TextFieldValue(text = "0,00", selection = TextRange(4))) }
-    var dataRaw by remember { mutableStateOf("") }
+    var dataRaw by remember { mutableStateOf(initialData) }
     var categoria by remember { mutableStateOf("") }
     var formaPagamento by remember { mutableStateOf("") }
     var observacoes by remember { mutableStateOf("") }

@@ -83,6 +83,10 @@ kotlin {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)
             implementation(libs.turbine.lib)
+            implementation(libs.compose.ui.test)
+        }
+        jvmTest.dependencies {
+            implementation(libs.skiko.awt.runtime.linux.x64)
         }
     }
 }
