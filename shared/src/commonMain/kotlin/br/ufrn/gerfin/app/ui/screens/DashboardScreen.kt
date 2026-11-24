@@ -2,6 +2,7 @@ package br.ufrn.gerfin.app.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +16,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -22,17 +25,24 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import br.ufrn.gerfin.app.model.Transacao
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.ufrn.gerfin.app.ui.components.ResumoCard
 import br.ufrn.gerfin.app.ui.components.TransacaoItem
+import br.ufrn.gerfin.app.ui.state.LancamentosUiState
+import br.ufrn.gerfin.app.ui.viewmodel.LancamentosViewModel
 
 @Composable
 @Suppress("FunctionNaming", "ktlint:standard:function-naming")
 fun DashboardScreen(
+    viewModel: LancamentosViewModel,
+    usuarioId: String,
     mesAtualNome: String,
     onMesAnterior: () -> Unit,
     onProximoMes: () -> Unit,
@@ -40,9 +50,10 @@ fun DashboardScreen(
     receitas: String,
     despesasPagas: String,
     despesasAberto: String,
-    transacoes: List<Transacao>,
     onNovaTransacao: () -> Unit,
 ) {
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = onNovaTransacao) {
@@ -69,7 +80,6 @@ fun DashboardScreen(
                 modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
             )
 
-            // Seletor de Mês
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -106,12 +116,64 @@ fun DashboardScreen(
                 modifier = Modifier.padding(bottom = 8.dp),
             )
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                items(transacoes, key = { it.id }) { transacao ->
-                    TransacaoItem(transacao = transacao)
+            when (val estado = uiState) {
+                is LancamentosUiState.Carregando -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            CircularProgressIndicator(
+                                modifier =
+                                    Modifier.semantics {
+                                        contentDescription = "Carregando lançamentos"
+                                    },
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text("Carregando lançamentos...")
+                        }
+                    }
+                }
+
+                is LancamentosUiState.Vazio -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("Nenhum lançamento encontrado.")
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Button(onClick = onNovaTransacao) {
+                                Text("Adicionar lançamento")
+                            }
+                        }
+                    }
+                }
+
+                is LancamentosUiState.Sucesso -> {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        items(estado.transacoes, key = { it.id }) { transacao ->
+                            TransacaoItem(transacao = transacao)
+                        }
+                    }
+                }
+
+                is LancamentosUiState.Erro -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(estado.mensagem)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Button(onClick = { viewModel.listarLancamentos(usuarioId) }) {
+                                Text("Tentar de novo")
+                            }
+                        }
+                    }
                 }
             }
         }

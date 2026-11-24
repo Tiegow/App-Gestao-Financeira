@@ -13,6 +13,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -23,6 +24,7 @@ import br.ufrn.gerfin.app.data.login
 import br.ufrn.gerfin.app.data.register
 import br.ufrn.gerfin.app.data.supabase
 import br.ufrn.gerfin.app.exception.CadastroException
+import br.ufrn.gerfin.app.model.Transacao
 import br.ufrn.gerfin.app.navigation.DashboardRoute
 import br.ufrn.gerfin.app.navigation.LoginRoute
 import br.ufrn.gerfin.app.navigation.NovaTransacaoRoute
@@ -31,6 +33,7 @@ import br.ufrn.gerfin.app.ui.screens.DashboardScreen
 import br.ufrn.gerfin.app.ui.screens.LoginScreen
 import br.ufrn.gerfin.app.ui.screens.NovaTransacaoScreen
 import br.ufrn.gerfin.app.ui.screens.RegisterScreen
+import br.ufrn.gerfin.app.ui.state.LancamentosUiState
 import br.ufrn.gerfin.app.ui.theme.GestFinTheme
 import br.ufrn.gerfin.app.ui.viewmodel.LancamentosViewModel
 import br.ufrn.gerfin.app.utils.formatarValor
@@ -59,7 +62,13 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
                 viewModel {
                     LancamentosViewModel(LancamentoRepository())
                 }
-            val transacoes = lancamentoView.transacoes
+            val uiState by lancamentoView.state.collectAsStateWithLifecycle()
+
+            val transacoes: List<Transacao> =
+                when (val estado = uiState) {
+                    is LancamentosUiState.Sucesso -> estado.transacoes
+                    else -> emptyList()
+                }
 
             var mesAtual by remember { mutableStateOf(10) }
             var anoAtual by remember { mutableStateOf(2026) }
@@ -87,7 +96,6 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
 
             val repository = remember { LancamentoRepository() }
 
-            // Filtra transações do mês
             val transacoesDoMes =
                 transacoes.filter {
                     val parts = it.data.split("/")
@@ -175,7 +183,10 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
                             lancamentoView.listarLancamentos(usuarioId)
                         }
                     }
+
                     DashboardScreen(
+                        viewModel = lancamentoView,
+                        usuarioId = usuarioId.orEmpty(),
                         mesAtualNome = "${mesesNomes[mesAtual]} $anoAtual",
                         onMesAnterior = {
                             if (mesAtual == 1) {
@@ -197,7 +208,6 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
                         receitas = formatarValor(totalReceitas),
                         despesasPagas = formatarValor(totalDespesasPagas),
                         despesasAberto = formatarValor(totalDespesasAberto),
-                        transacoes = transacoesDoMes,
                         onNovaTransacao = {
                             navController.navigate(NovaTransacaoRoute)
                         },
@@ -214,22 +224,16 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
                             println("Erro meu chapa.")
                         }
                     }
+
                     NovaTransacaoScreen(
                         categorias = categorias,
                         onSalvar = { novaTransacao ->
-                            scope.launch {
-                                try {
-                                    val usuarioId =
-                                        supabase.auth.currentUserOrNull()?.id
-                                            ?: error("Usuário não autenticado")
-
-                                    lancamentoView.salvarLancamento(usuarioId, novaTransacao)
-                                    navController.popBackStack()
-                                } catch (e: CancellationException) {
-                                    throw e
-                                } catch (e: Exception) {
-                                    mensagemErro = "Não foi possível salvar o lançamento."
-                                }
+                            val usuarioId = supabase.auth.currentUserOrNull()?.id
+                            if (usuarioId == null) {
+                                mensagemErro = "Usuário não autenticado"
+                            } else {
+                                lancamentoView.salvarLancamento(usuarioId, novaTransacao)
+                                navController.popBackStack()
                             }
                         },
                         onCancelar = {
