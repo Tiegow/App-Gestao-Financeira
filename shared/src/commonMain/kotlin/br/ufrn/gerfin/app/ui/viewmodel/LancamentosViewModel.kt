@@ -1,19 +1,16 @@
 package br.ufrn.gerfin.app.ui.viewmodel
 
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.ufrn.gerfin.app.data.LancamentoRepositoryContract
 import br.ufrn.gerfin.app.data.toInsertDto
 import br.ufrn.gerfin.app.data.toTransacao
 import br.ufrn.gerfin.app.model.Transacao
-import kotlinx.coroutines.launch
 import br.ufrn.gerfin.app.ui.state.LancamentosUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class LancamentosViewModel(
     private val repository: LancamentoRepositoryContract,
@@ -25,8 +22,7 @@ class LancamentosViewModel(
 
     val state: StateFlow<LancamentosUiState> = _state.asStateFlow()
 
-    var transacoes by mutableStateOf<List<Transacao>>(emptyList())
-        private set
+    private var transacoesAtuais: List<Transacao> = emptyList()
 
     fun listarLancamentos(usuarioId: String) {
         viewModelScope.launch {
@@ -36,15 +32,15 @@ class LancamentosViewModel(
                 val categorias = repository.categorias()
                 val lancamentos = repository.listar(usuarioId)
 
-                transacoes = lancamentos.map { it.toTransacao(categorias) }
+                transacoesAtuais = lancamentos.map { it.toTransacao(categorias) }
 
                 _state.value =
-                    if (transacoes.isEmpty()) {
+                    if (transacoesAtuais.isEmpty()) {
                         LancamentosUiState.Vazio
                     } else {
-                        LancamentosUiState.Sucesso(transacoes)
+                        LancamentosUiState.Sucesso(transacoesAtuais)
                     }
-            } catch (exception: Exception) {
+            } catch (_: Exception) {
                 _state.value =
                     LancamentosUiState.Erro(
                         "Não foi possível carregar os lançamentos.",
@@ -53,14 +49,23 @@ class LancamentosViewModel(
         }
     }
 
-    suspend fun salvarLancamento(
+    fun salvarLancamento(
         usuarioId: String,
         transacao: Transacao,
     ) {
-        val categorias = repository.categorias()
-        val dto = transacao.toInsertDto(usuarioId, categorias)
-        val salvo = repository.inserir(dto)
+        viewModelScope.launch {
+            try {
+                val categorias = repository.categorias()
+                val dto = transacao.toInsertDto(usuarioId, categorias)
+                val salvo = repository.inserir(dto).toTransacao(categorias)
 
-        transacoes = listOf(salvo.toTransacao(categorias)) + transacoes
+                transacoesAtuais = listOf(salvo) + transacoesAtuais
+                _state.value = LancamentosUiState.Sucesso(transacoesAtuais)
+            } catch (_: Exception) {
+                if (transacoesAtuais.isNotEmpty()) {
+                    _state.value = LancamentosUiState.Sucesso(transacoesAtuais)
+                }
+            }
+        }
     }
 }
