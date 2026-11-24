@@ -4,7 +4,7 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.runComposeUiTest
+import androidx.compose.ui.test.v2.runComposeUiTest
 import br.ufrn.gerfin.app.ui.components.LancamentosContent
 import br.ufrn.gerfin.app.ui.state.LancamentosUiState
 import kotlin.test.Test
@@ -47,6 +47,7 @@ class DashboardScreenTest {
                 .assertIsDisplayed()
 
             onNodeWithText("Tentar novamente").performClick()
+            waitForIdle()
 
             assertTrue(tentouNovamente)
         }

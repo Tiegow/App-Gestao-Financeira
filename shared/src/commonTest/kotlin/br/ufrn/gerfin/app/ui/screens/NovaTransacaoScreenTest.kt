@@ -8,7 +8,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
-import androidx.compose.ui.test.runComposeUiTest
+import androidx.compose.ui.test.v2.runComposeUiTest
 import br.ufrn.gerfin.app.data.CategoriaDto
 import br.ufrn.gerfin.app.model.TipoCategoria
 import kotlin.test.Test
@@ -64,6 +64,7 @@ class NovaTransacaoScreenTest {
 
             onNodeWithText("Salvar").assertIsEnabled()
             onNodeWithText("Salvar").performClick()
+            waitForIdle()
 
             assertTrue(transacaoSalva)
         }
