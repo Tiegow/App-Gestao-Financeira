@@ -1,14 +1,15 @@
 package br.ufrn.gerfin.app.ui.components
 
-import androidx.compose.runtime.Composable
-import androidx.compose.material3.Text
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import br.ufrn.gerfin.app.ui.state.LancamentosUiState
 
 @Composable
+@Suppress("FunctionNaming", "ktlint:standard:function-naming")
 fun LancamentosContent(
     state: LancamentosUiState,
     onTentarNovamente: () -> Unit,

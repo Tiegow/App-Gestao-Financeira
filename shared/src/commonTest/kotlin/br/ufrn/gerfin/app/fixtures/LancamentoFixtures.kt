@@ -4,8 +4,8 @@ import br.ufrn.gerfin.app.data.LancamentoDto
 import br.ufrn.gerfin.app.model.TipoLancamento
 import kotlinx.datetime.Instant
 
-fun lancamentoDtoFake(): LancamentoDto {
-    return LancamentoDto(
+fun lancamentoDtoFake(): LancamentoDto =
+    LancamentoDto(
         id = 1,
         valor = 1000,
         faturavel = true,
@@ -16,4 +16,3 @@ fun lancamentoDtoFake(): LancamentoDto {
         tipo = TipoLancamento.DESPESA_SIMPLES,
         categoriaId = 1,
     )
-}

@@ -1,6 +1,5 @@
 package br.ufrn.gerfin.app.data
 
-import br.ufrn.gerfin.app.model.TipoCategoria
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order

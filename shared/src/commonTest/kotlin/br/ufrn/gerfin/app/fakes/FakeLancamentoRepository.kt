@@ -15,9 +15,7 @@ class FakeLancamentoRepository(
             mutableListOf(Result.success(lancamentos))
         }
 
-    override suspend fun listar(
-        usuarioId: String,
-    ): List<LancamentoDto> {
+    override suspend fun listar(usuarioId: String): List<LancamentoDto> {
         excecao?.let { throw it }
         val resposta =
             if (respostasPendentes.size > 1) {

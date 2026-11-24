@@ -1,8 +1,8 @@
 package br.ufrn.gerfin.app.ui.viewmodel
 
 import app.cash.turbine.test
-import br.ufrn.gerfin.app.fixtures.lancamentoDtoFake
 import br.ufrn.gerfin.app.fakes.FakeLancamentoRepository
+import br.ufrn.gerfin.app.fixtures.lancamentoDtoFake
 import br.ufrn.gerfin.app.ui.state.LancamentosUiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
