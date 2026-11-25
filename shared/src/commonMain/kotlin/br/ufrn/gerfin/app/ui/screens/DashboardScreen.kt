@@ -14,8 +14,8 @@ import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
@@ -24,6 +24,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,12 +45,19 @@ fun DashboardScreen(
     onProximoMes: () -> Unit,
     onTentarNovamente: () -> Unit,
     onNovaTransacao: () -> Unit,
+    onAbrirRelatorioAnual: () -> Unit = {},
 ) {
     val sucesso = uiState as? LancamentosUiState.Sucesso
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = onNovaTransacao) {
+            FloatingActionButton(
+                onClick = onNovaTransacao,
+                modifier =
+                    Modifier.semantics {
+                        contentDescription = "Adicionar nova transação"
+                    },
+            ) {
                 Text("+", style = MaterialTheme.typography.titleLarge)
             }
         },
@@ -66,12 +74,23 @@ fun DashboardScreen(
                     .padding(paddingValues)
                     .padding(horizontal = 16.dp),
         ) {
-            Text(
-                text = "GestFin",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
-            )
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, bottom = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "GestFin",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+                TextButton(onClick = onAbrirRelatorioAnual) {
+                    Text("Relatório Anual")
+                }
+            }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -79,7 +98,10 @@ fun DashboardScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 IconButton(onClick = onMesAnterior) {
-                    Icon(Icons.Default.KeyboardArrowLeft, contentDescription = "Mês anterior")
+                    Icon(
+                        Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                        contentDescription = "Mês anterior",
+                    )
                 }
                 Text(
                     text = mesAtualNome,
@@ -87,7 +109,10 @@ fun DashboardScreen(
                     fontWeight = FontWeight.SemiBold,
                 )
                 IconButton(onClick = onProximoMes) {
-                    Icon(Icons.Default.KeyboardArrowRight, contentDescription = "Próximo mês")
+                    Icon(
+                        Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = "Próximo mês",
+                    )
                 }
             }
 

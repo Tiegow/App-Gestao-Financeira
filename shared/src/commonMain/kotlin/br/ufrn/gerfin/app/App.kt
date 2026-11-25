@@ -28,10 +28,12 @@ import br.ufrn.gerfin.app.navigation.DashboardRoute
 import br.ufrn.gerfin.app.navigation.LoginRoute
 import br.ufrn.gerfin.app.navigation.NovaTransacaoRoute
 import br.ufrn.gerfin.app.navigation.RegisterRoute
+import br.ufrn.gerfin.app.navigation.RelatorioAnualRoute
 import br.ufrn.gerfin.app.ui.screens.DashboardScreen
 import br.ufrn.gerfin.app.ui.screens.LoginScreen
 import br.ufrn.gerfin.app.ui.screens.NovaTransacaoScreen
 import br.ufrn.gerfin.app.ui.screens.RegisterScreen
+import br.ufrn.gerfin.app.ui.screens.RelatorioAnualScreen
 import br.ufrn.gerfin.app.ui.theme.GestFinTheme
 import br.ufrn.gerfin.app.ui.viewmodel.LancamentosViewModel
 import io.github.jan.supabase.auth.auth
@@ -56,6 +58,8 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
                 }
             val uiState by lancamentoView.state.collectAsStateWithLifecycle()
             val mesAtualNome by lancamentoView.mesAtualNome.collectAsStateWithLifecycle()
+            val relatorioAnualState by lancamentoView.relatorioAnualState.collectAsStateWithLifecycle()
+            val anoRelatorio by lancamentoView.anoRelatorio.collectAsStateWithLifecycle()
 
             var categorias by remember {
                 mutableStateOf<List<CategoriaDto>>(emptyList())
@@ -138,6 +142,28 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
                         },
                         onNovaTransacao = {
                             navController.navigate(NovaTransacaoRoute)
+                        },
+                        onAbrirRelatorioAnual = {
+                            navController.navigate(RelatorioAnualRoute)
+                        },
+                    )
+                }
+
+                composable<RelatorioAnualRoute> {
+                    val usuarioId = supabase.auth.currentUserOrNull()?.id
+
+                    RelatorioAnualScreen(
+                        uiState = relatorioAnualState,
+                        anoSelecionado = anoRelatorio,
+                        onAnoAnterior = { lancamentoView.anoRelatorioAnterior() },
+                        onProximoAno = { lancamentoView.proximoAnoRelatorio() },
+                        onTentarNovamente = {
+                            if (usuarioId != null) {
+                                lancamentoView.listarLancamentos(usuarioId)
+                            }
+                        },
+                        onVoltar = {
+                            navController.popBackStack()
                         },
                     )
                 }

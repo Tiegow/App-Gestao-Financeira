@@ -7,6 +7,8 @@ import br.ufrn.gerfin.app.data.toInsertDto
 import br.ufrn.gerfin.app.data.toTransacao
 import br.ufrn.gerfin.app.model.Transacao
 import br.ufrn.gerfin.app.ui.state.LancamentosUiState
+import br.ufrn.gerfin.app.ui.state.RelatorioAnualUiState
+import br.ufrn.gerfin.app.ui.state.ResumoMensalAnual
 import br.ufrn.gerfin.app.utils.formatarValor
 import br.ufrn.gerfin.app.utils.parseValor
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +36,60 @@ private val MESES_NOMES =
 private const val MES_INICIAL = 10
 private const val ANO_INICIAL = 2026
 private const val DEZEMBRO = 12
+private const val PARTES_DATA = 3
+
+private fun extrairMesAno(data: String): Pair<Int, Int>? {
+    val parts = data.split("/")
+    if (parts.size != PARTES_DATA) return null
+    val mes = parts[1].toIntOrNull() ?: return null
+    val ano = parts[2].toIntOrNull() ?: return null
+    return mes to ano
+}
+
+private fun calcularRelatorioAnual(
+    transacoes: List<Transacao>,
+    ano: Int,
+): RelatorioAnualUiState {
+    val transacoesDoAno =
+        transacoes.filter { transacao ->
+            extrairMesAno(transacao.data)?.second == ano
+        }
+
+    if (transacoesDoAno.isEmpty()) {
+        return RelatorioAnualUiState.Vazio
+    }
+
+    val meses =
+        (1..DEZEMBRO).map { mes ->
+            val doMes =
+                transacoesDoAno.filter { transacao ->
+                    extrairMesAno(transacao.data)?.first == mes
+                }
+            val entradasMes = doMes.filter { it.isReceita }.sumOf { parseValor(it.valor) }
+            val saidasMes = doMes.filter { !it.isReceita }.sumOf { parseValor(it.valor) }
+            val saldoMes = entradasMes - saidasMes
+
+            ResumoMensalAnual(
+                mesNumero = mes,
+                mesNome = MESES_NOMES[mes],
+                entradas = formatarValor(entradasMes),
+                saidas = formatarValor(saidasMes),
+                saldo = formatarValor(saldoMes),
+                isSaldoNegativo = saldoMes < 0.0,
+            )
+        }
+
+    val totalEntradas = transacoesDoAno.filter { it.isReceita }.sumOf { parseValor(it.valor) }
+    val totalSaidas = transacoesDoAno.filter { !it.isReceita }.sumOf { parseValor(it.valor) }
+    val saldoAcumulado = totalEntradas - totalSaidas
+
+    return RelatorioAnualUiState.Sucesso(
+        totalEntradas = formatarValor(totalEntradas),
+        totalSaidas = formatarValor(totalSaidas),
+        saldoAcumulado = formatarValor(saldoAcumulado),
+        meses = meses,
+    )
+}
 
 class LancamentosViewModel(
     private val repository: LancamentoRepositoryContract,
@@ -45,11 +101,21 @@ class LancamentosViewModel(
 
     val state: StateFlow<LancamentosUiState> = _state.asStateFlow()
 
+    private val _relatorioAnualState =
+        MutableStateFlow<RelatorioAnualUiState>(
+            RelatorioAnualUiState.Carregando,
+        )
+
+    val relatorioAnualState: StateFlow<RelatorioAnualUiState> = _relatorioAnualState.asStateFlow()
+
     private var mesAtual = MES_INICIAL
     private var anoAtual = ANO_INICIAL
 
     private val _mesAtualNome = MutableStateFlow("${MESES_NOMES[mesAtual]} $anoAtual")
     val mesAtualNome: StateFlow<String> = _mesAtualNome.asStateFlow()
+
+    private val _anoRelatorio = MutableStateFlow(ANO_INICIAL)
+    val anoRelatorio: StateFlow<Int> = _anoRelatorio.asStateFlow()
 
     private var transacoesAtuais: List<Transacao> = emptyList()
 
@@ -75,6 +141,16 @@ class LancamentosViewModel(
         atualizarEstadoMes()
     }
 
+    fun anoRelatorioAnterior() {
+        _anoRelatorio.value--
+        atualizarEstadoAnual()
+    }
+
+    fun proximoAnoRelatorio() {
+        _anoRelatorio.value++
+        atualizarEstadoAnual()
+    }
+
     private fun atualizarEstadoMes() {
         if (_state.value is LancamentosUiState.Carregando || _state.value is LancamentosUiState.Erro) {
             return
@@ -82,17 +158,20 @@ class LancamentosViewModel(
         _state.value = calcularEstadoDoMes()
     }
 
+    private fun atualizarEstadoAnual() {
+        if (
+            _relatorioAnualState.value is RelatorioAnualUiState.Carregando ||
+            _relatorioAnualState.value is RelatorioAnualUiState.Erro
+        ) {
+            return
+        }
+        _relatorioAnualState.value = calcularRelatorioAnual(transacoesAtuais, _anoRelatorio.value)
+    }
+
     private fun calcularEstadoDoMes(): LancamentosUiState {
         val transacoesDoMes =
             transacoesAtuais.filter { transacao ->
-                val parts = transacao.data.split("/")
-                if (parts.size == 3) {
-                    val m = parts[1].toIntOrNull()
-                    val y = parts[2].toIntOrNull()
-                    m == mesAtual && y == anoAtual
-                } else {
-                    false
-                }
+                extrairMesAno(transacao.data) == (mesAtual to anoAtual)
             }
 
         if (transacoesDoMes.isEmpty()) {
@@ -116,6 +195,7 @@ class LancamentosViewModel(
     fun listarLancamentos(usuarioId: String) {
         viewModelScope.launch {
             _state.value = LancamentosUiState.Carregando
+            _relatorioAnualState.value = RelatorioAnualUiState.Carregando
 
             try {
                 val categorias = repository.categorias()
@@ -123,11 +203,11 @@ class LancamentosViewModel(
 
                 transacoesAtuais = lancamentos.map { it.toTransacao(categorias) }
                 _state.value = calcularEstadoDoMes()
+                _relatorioAnualState.value = calcularRelatorioAnual(transacoesAtuais, _anoRelatorio.value)
             } catch (_: Exception) {
-                _state.value =
-                    LancamentosUiState.Erro(
-                        "Não foi possível carregar os lançamentos.",
-                    )
+                val mensagemErro = "Não foi possível carregar os lançamentos."
+                _state.value = LancamentosUiState.Erro(mensagemErro)
+                _relatorioAnualState.value = RelatorioAnualUiState.Erro(mensagemErro)
             }
         }
     }
@@ -144,9 +224,11 @@ class LancamentosViewModel(
 
                 transacoesAtuais = listOf(salvo) + transacoesAtuais
                 _state.value = calcularEstadoDoMes()
+                _relatorioAnualState.value = calcularRelatorioAnual(transacoesAtuais, _anoRelatorio.value)
             } catch (_: Exception) {
                 if (_state.value !is LancamentosUiState.Carregando) {
                     _state.value = calcularEstadoDoMes()
+                    _relatorioAnualState.value = calcularRelatorioAnual(transacoesAtuais, _anoRelatorio.value)
                 }
             }
         }

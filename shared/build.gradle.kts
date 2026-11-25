@@ -90,7 +90,7 @@ kotlin {
             implementation(libs.kotlin.test)
         }
         jvmTest.dependencies {
-            implementation(libs.skiko.awt.runtime.linux.x64)
+            implementation(compose.desktop.currentOs)
         }
     }
 }

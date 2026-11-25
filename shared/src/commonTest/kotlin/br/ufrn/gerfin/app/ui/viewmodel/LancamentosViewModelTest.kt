@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import br.ufrn.gerfin.app.fakes.FakeLancamentoRepository
 import br.ufrn.gerfin.app.fixtures.lancamentoDtoFake
 import br.ufrn.gerfin.app.ui.state.LancamentosUiState
+import br.ufrn.gerfin.app.ui.state.RelatorioAnualUiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -148,6 +149,72 @@ class LancamentosViewModelTest {
 
                 val estado = assertIs<LancamentosUiState.Sucesso>(awaitItem())
                 assertEquals(1, estado.transacoes.size)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `filtra lancamentos por mes ao navegar entre meses`() =
+        runTest {
+            val viewModel =
+                LancamentosViewModel(
+                    FakeLancamentoRepository(
+                        lancamentos = listOf(lancamentoDtoFake()),
+                    ),
+                )
+
+            viewModel.state.test {
+                assertIs<LancamentosUiState.Carregando>(awaitItem())
+
+                viewModel.listarLancamentos("usuario-1")
+                advanceUntilIdle()
+
+                val outubro = assertIs<LancamentosUiState.Sucesso>(awaitItem())
+                assertEquals(1, outubro.transacoes.size)
+                assertEquals("-10,00", outubro.saldoEstimado)
+
+                viewModel.proximoMes()
+                assertIs<LancamentosUiState.Vazio>(awaitItem())
+
+                viewModel.mesAnterior()
+                val voltaOutubro = assertIs<LancamentosUiState.Sucesso>(awaitItem())
+                assertEquals(1, voltaOutubro.transacoes.size)
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `consolida relatorio anual dos 12 meses e permite trocar de ano`() =
+        runTest {
+            val viewModel =
+                LancamentosViewModel(
+                    FakeLancamentoRepository(
+                        lancamentos = listOf(lancamentoDtoFake()),
+                    ),
+                )
+
+            viewModel.relatorioAnualState.test {
+                assertIs<RelatorioAnualUiState.Carregando>(awaitItem())
+
+                viewModel.listarLancamentos("usuario-1")
+                advanceUntilIdle()
+
+                val ano2026 = assertIs<RelatorioAnualUiState.Sucesso>(awaitItem())
+                assertEquals(12, ano2026.meses.size)
+                assertEquals("0,00", ano2026.totalEntradas)
+                assertEquals("10,00", ano2026.totalSaidas)
+                assertEquals("-10,00", ano2026.saldoAcumulado)
+
+                viewModel.proximoAnoRelatorio()
+                assertEquals(2027, viewModel.anoRelatorio.value)
+                assertIs<RelatorioAnualUiState.Vazio>(awaitItem())
+
+                viewModel.anoRelatorioAnterior()
+                assertEquals(2026, viewModel.anoRelatorio.value)
+                val volta2026 = assertIs<RelatorioAnualUiState.Sucesso>(awaitItem())
+                assertEquals("-10,00", volta2026.saldoAcumulado)
+
                 cancelAndIgnoreRemainingEvents()
             }
         }
