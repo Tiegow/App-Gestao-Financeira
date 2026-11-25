@@ -85,6 +85,10 @@ kotlin {
             implementation(libs.turbine.lib)
             implementation(libs.compose.ui.test)
         }
+        getByName("androidHostTest").dependencies {
+            implementation(libs.robolectric)
+            implementation(libs.kotlin.test)
+        }
         jvmTest.dependencies {
             implementation(libs.skiko.awt.runtime.linux.x64)
         }
