@@ -25,34 +25,27 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.ufrn.gerfin.app.ui.components.ResumoCard
 import br.ufrn.gerfin.app.ui.components.TransacaoItem
 import br.ufrn.gerfin.app.ui.state.LancamentosUiState
-import br.ufrn.gerfin.app.ui.viewmodel.LancamentosViewModel
 
 @Composable
 @Suppress("FunctionNaming", "ktlint:standard:function-naming")
 fun DashboardScreen(
-    viewModel: LancamentosViewModel,
-    usuarioId: String,
+    uiState: LancamentosUiState,
     mesAtualNome: String,
     onMesAnterior: () -> Unit,
     onProximoMes: () -> Unit,
-    saldoEstimado: String,
-    receitas: String,
-    despesasPagas: String,
-    despesasAberto: String,
+    onTentarNovamente: () -> Unit,
     onNovaTransacao: () -> Unit,
 ) {
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val sucesso = uiState as? LancamentosUiState.Sucesso
 
     Scaffold(
         floatingActionButton = {
@@ -101,10 +94,10 @@ fun DashboardScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             ResumoCard(
-                saldoEstimado = saldoEstimado,
-                receitas = receitas,
-                despesasPagas = despesasPagas,
-                despesasAberto = despesasAberto,
+                saldoEstimado = sucesso?.saldoEstimado ?: "0,00",
+                receitas = sucesso?.receitas ?: "0,00",
+                despesasPagas = sucesso?.despesasPagas ?: "0,00",
+                despesasAberto = sucesso?.despesasAberto ?: "0,00",
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -169,7 +162,7 @@ fun DashboardScreen(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(estado.mensagem)
                             Spacer(modifier = Modifier.height(8.dp))
-                            Button(onClick = { viewModel.listarLancamentos(usuarioId) }) {
+                            Button(onClick = onTentarNovamente) {
                                 Text("Tentar de novo")
                             }
                         }

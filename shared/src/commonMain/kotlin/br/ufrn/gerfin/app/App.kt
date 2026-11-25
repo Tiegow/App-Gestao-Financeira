@@ -24,7 +24,6 @@ import br.ufrn.gerfin.app.data.login
 import br.ufrn.gerfin.app.data.register
 import br.ufrn.gerfin.app.data.supabase
 import br.ufrn.gerfin.app.exception.CadastroException
-import br.ufrn.gerfin.app.model.Transacao
 import br.ufrn.gerfin.app.navigation.DashboardRoute
 import br.ufrn.gerfin.app.navigation.LoginRoute
 import br.ufrn.gerfin.app.navigation.NovaTransacaoRoute
@@ -33,18 +32,11 @@ import br.ufrn.gerfin.app.ui.screens.DashboardScreen
 import br.ufrn.gerfin.app.ui.screens.LoginScreen
 import br.ufrn.gerfin.app.ui.screens.NovaTransacaoScreen
 import br.ufrn.gerfin.app.ui.screens.RegisterScreen
-import br.ufrn.gerfin.app.ui.state.LancamentosUiState
 import br.ufrn.gerfin.app.ui.theme.GestFinTheme
 import br.ufrn.gerfin.app.ui.viewmodel.LancamentosViewModel
-import br.ufrn.gerfin.app.utils.formatarValor
 import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.launch
 import kotlin.coroutines.cancellation.CancellationException
-
-private fun parseValor(valorStr: String): Double {
-    val limpo = valorStr.replace(".", "").replace(",", ".")
-    return limpo.toDoubleOrNull() ?: 0.0
-}
 
 @Composable
 @Suppress("FunctionNaming", "ktlint:standard:function-naming", "LongMethod")
@@ -63,63 +55,13 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
                     LancamentosViewModel(LancamentoRepository())
                 }
             val uiState by lancamentoView.state.collectAsStateWithLifecycle()
-
-            val transacoes: List<Transacao> =
-                when (val estado = uiState) {
-                    is LancamentosUiState.Sucesso -> estado.transacoes
-                    else -> emptyList()
-                }
-
-            var mesAtual by remember { mutableStateOf(10) }
-            var anoAtual by remember { mutableStateOf(2026) }
-
-            val mesesNomes =
-                listOf(
-                    "",
-                    "Janeiro",
-                    "Fevereiro",
-                    "Março",
-                    "Abril",
-                    "Maio",
-                    "Junho",
-                    "Julho",
-                    "Agosto",
-                    "Setembro",
-                    "Outubro",
-                    "Novembro",
-                    "Dezembro",
-                )
+            val mesAtualNome by lancamentoView.mesAtualNome.collectAsStateWithLifecycle()
 
             var categorias by remember {
                 mutableStateOf<List<CategoriaDto>>(emptyList())
             }
 
             val repository = remember { LancamentoRepository() }
-
-            val transacoesDoMes =
-                transacoes.filter {
-                    val parts = it.data.split("/")
-                    if (parts.size == 3) {
-                        val m = parts[1].toIntOrNull()
-                        val y = parts[2].toIntOrNull()
-                        m == mesAtual && y == anoAtual
-                    } else {
-                        false
-                    }
-                }
-
-            val totalReceitas =
-                transacoesDoMes.filter { it.isReceita }.sumOf { parseValor(it.valor) }
-            val totalDespesasPagas =
-                transacoesDoMes
-                    .filter { !it.isReceita && it.isPago }
-                    .sumOf { parseValor(it.valor) }
-            val totalDespesasAberto =
-                transacoesDoMes
-                    .filter { !it.isReceita && !it.isPago }
-                    .sumOf { parseValor(it.valor) }
-
-            val saldoMes = totalReceitas - totalDespesasPagas - totalDespesasAberto
 
             NavHost(
                 navController = navController,
@@ -185,29 +127,15 @@ fun App(darkTheme: Boolean = isSystemInDarkTheme()) {
                     }
 
                     DashboardScreen(
-                        viewModel = lancamentoView,
-                        usuarioId = usuarioId.orEmpty(),
-                        mesAtualNome = "${mesesNomes[mesAtual]} $anoAtual",
-                        onMesAnterior = {
-                            if (mesAtual == 1) {
-                                mesAtual = 12
-                                anoAtual--
-                            } else {
-                                mesAtual--
+                        uiState = uiState,
+                        mesAtualNome = mesAtualNome,
+                        onMesAnterior = { lancamentoView.mesAnterior() },
+                        onProximoMes = { lancamentoView.proximoMes() },
+                        onTentarNovamente = {
+                            if (usuarioId != null) {
+                                lancamentoView.listarLancamentos(usuarioId)
                             }
                         },
-                        onProximoMes = {
-                            if (mesAtual == 12) {
-                                mesAtual = 1
-                                anoAtual++
-                            } else {
-                                mesAtual++
-                            }
-                        },
-                        saldoEstimado = formatarValor(saldoMes),
-                        receitas = formatarValor(totalReceitas),
-                        despesasPagas = formatarValor(totalDespesasPagas),
-                        despesasAberto = formatarValor(totalDespesasAberto),
                         onNovaTransacao = {
                             navController.navigate(NovaTransacaoRoute)
                         },

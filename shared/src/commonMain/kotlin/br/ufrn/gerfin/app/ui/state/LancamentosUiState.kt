@@ -9,6 +9,10 @@ sealed interface LancamentosUiState {
 
     data class Sucesso(
         val transacoes: List<Transacao>,
+        val saldoEstimado: String = "0,00",
+        val receitas: String = "0,00",
+        val despesasPagas: String = "0,00",
+        val despesasAberto: String = "0,00",
     ) : LancamentosUiState
 
     data class Erro(
