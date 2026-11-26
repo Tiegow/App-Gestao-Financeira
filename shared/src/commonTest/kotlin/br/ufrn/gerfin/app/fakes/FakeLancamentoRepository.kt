@@ -1,21 +1,21 @@
 package br.ufrn.gerfin.app.fakes
 
-import br.ufrn.gerfin.app.data.CategoriaDto
-import br.ufrn.gerfin.app.data.LancamentoDto
-import br.ufrn.gerfin.app.data.LancamentoInsertDto
-import br.ufrn.gerfin.app.data.LancamentoRepositoryContract
+import br.ufrn.gerfin.app.domain.model.Categoria
+import br.ufrn.gerfin.app.domain.model.Transacao
+import br.ufrn.gerfin.app.domain.repository.LancamentoRepository
 
 class FakeLancamentoRepository(
-    private val lancamentos: List<LancamentoDto> = emptyList(),
+    private val transacoes: List<Transacao> = emptyList(),
+    private val categoriasLista: List<Categoria> = emptyList(),
     private val excecao: Exception? = null,
-    respostas: List<Result<List<LancamentoDto>>> = emptyList(),
-) : LancamentoRepositoryContract {
+    respostas: List<Result<List<Transacao>>> = emptyList(),
+) : LancamentoRepository {
     private val respostasPendentes =
         respostas.toMutableList().ifEmpty {
-            mutableListOf(Result.success(lancamentos))
+            mutableListOf(Result.success(transacoes))
         }
 
-    override suspend fun listar(usuarioId: String): List<LancamentoDto> {
+    override suspend fun listar(usuarioId: String): List<Transacao> {
         excecao?.let { throw it }
         val resposta =
             if (respostasPendentes.size > 1) {
@@ -26,14 +26,16 @@ class FakeLancamentoRepository(
         return resposta.getOrThrow()
     }
 
-    override suspend fun inserir(dto: LancamentoInsertDto): LancamentoDto {
+    override suspend fun inserir(
+        usuarioId: String,
+        transacao: Transacao,
+    ): Transacao {
         excecao?.let { throw it }
-        return lancamentos.firstOrNull()
-            ?: error("Nenhum lançamento configurado para inserção")
+        return transacao
     }
 
-    override suspend fun categorias(): List<CategoriaDto> {
+    override suspend fun categorias(): List<Categoria> {
         excecao?.let { throw it }
-        return emptyList()
+        return categoriasLista
     }
 }

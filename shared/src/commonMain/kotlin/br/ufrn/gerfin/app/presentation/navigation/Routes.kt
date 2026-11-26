@@ -1,0 +1,18 @@
+package br.ufrn.gerfin.app.presentation.navigation
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data object DashboardRoute
+
+@Serializable
+data object NovaTransacaoRoute
+
+@Serializable
+data object LoginRoute
+
+@Serializable
+data object RegisterRoute
+
+@Serializable
+data object RelatorioAnualRoute
