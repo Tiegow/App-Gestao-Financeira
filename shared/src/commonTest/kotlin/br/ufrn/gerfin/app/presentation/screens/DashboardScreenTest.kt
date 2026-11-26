@@ -1,12 +1,12 @@
-package br.ufrn.gerfin.app.ui.screens
+package br.ufrn.gerfin.app.presentation.screens
 
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.v2.runComposeUiTest
-import br.ufrn.gerfin.app.ui.components.LancamentosContent
-import br.ufrn.gerfin.app.ui.state.LancamentosUiState
+import br.ufrn.gerfin.app.presentation.components.LancamentosContent
+import br.ufrn.gerfin.app.presentation.state.LancamentosUiState
 import kotlin.test.Test
 import kotlin.test.assertTrue
 

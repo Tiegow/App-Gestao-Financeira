@@ -1,10 +1,10 @@
-package br.ufrn.gerfin.app.ui.viewmodel
+package br.ufrn.gerfin.app.presentation.viewmodel
 
 import app.cash.turbine.test
 import br.ufrn.gerfin.app.fakes.FakeLancamentoRepository
-import br.ufrn.gerfin.app.fixtures.lancamentoDtoFake
-import br.ufrn.gerfin.app.ui.state.LancamentosUiState
-import br.ufrn.gerfin.app.ui.state.RelatorioAnualUiState
+import br.ufrn.gerfin.app.fixtures.transacaoFake
+import br.ufrn.gerfin.app.presentation.state.LancamentosUiState
+import br.ufrn.gerfin.app.presentation.state.RelatorioAnualUiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -38,7 +38,7 @@ class LancamentosViewModelTest {
             val viewModel =
                 LancamentosViewModel(
                     FakeLancamentoRepository(
-                        lancamentos = listOf(lancamentoDtoFake()),
+                        transacoes = listOf(transacaoFake()),
                     ),
                 )
 
@@ -111,7 +111,7 @@ class LancamentosViewModelTest {
                         respostas =
                             listOf(
                                 Result.failure(IllegalStateException("Falha")),
-                                Result.success(listOf(lancamentoDtoFake())),
+                                Result.success(listOf(transacaoFake())),
                             ),
                     ),
                 )
@@ -138,7 +138,7 @@ class LancamentosViewModelTest {
             val viewModel =
                 LancamentosViewModel(
                     FakeLancamentoRepository(
-                        lancamentos = listOf(lancamentoDtoFake()),
+                        transacoes = listOf(transacaoFake()),
                     ),
                 )
 
@@ -159,7 +159,7 @@ class LancamentosViewModelTest {
             val viewModel =
                 LancamentosViewModel(
                     FakeLancamentoRepository(
-                        lancamentos = listOf(lancamentoDtoFake()),
+                        transacoes = listOf(transacaoFake()),
                     ),
                 )
 
@@ -190,7 +190,7 @@ class LancamentosViewModelTest {
             val viewModel =
                 LancamentosViewModel(
                     FakeLancamentoRepository(
-                        lancamentos = listOf(lancamentoDtoFake()),
+                        transacoes = listOf(transacaoFake()),
                     ),
                 )
 

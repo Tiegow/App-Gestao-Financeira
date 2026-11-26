@@ -1,4 +1,4 @@
-package br.ufrn.gerfin.app.ui.screens
+package br.ufrn.gerfin.app.presentation.screens
 
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed

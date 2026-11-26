@@ -1,4 +1,4 @@
-package br.ufrn.gerfin.app.navigation
+package br.ufrn.gerfin.app.presentation.navigation
 
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
@@ -9,12 +9,12 @@ import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import br.ufrn.gerfin.app.ui.screens.DashboardScreen
-import br.ufrn.gerfin.app.ui.screens.NovaTransacaoScreen
-import br.ufrn.gerfin.app.ui.screens.RelatorioAnualScreen
-import br.ufrn.gerfin.app.ui.state.LancamentosUiState
-import br.ufrn.gerfin.app.ui.state.RelatorioAnualUiState
-import br.ufrn.gerfin.app.ui.theme.GestFinTheme
+import br.ufrn.gerfin.app.presentation.screens.DashboardScreen
+import br.ufrn.gerfin.app.presentation.screens.NovaTransacaoScreen
+import br.ufrn.gerfin.app.presentation.screens.RelatorioAnualScreen
+import br.ufrn.gerfin.app.presentation.state.LancamentosUiState
+import br.ufrn.gerfin.app.presentation.state.RelatorioAnualUiState
+import br.ufrn.gerfin.app.presentation.theme.GestFinTheme
 import kotlin.test.Test
 
 @OptIn(ExperimentalTestApi::class)

@@ -1,4 +1,4 @@
-package br.ufrn.gerfin.app.ui.screens
+package br.ufrn.gerfin.app.presentation.screens
 
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
@@ -6,9 +6,9 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.v2.runComposeUiTest
-import br.ufrn.gerfin.app.ui.state.RelatorioAnualUiState
-import br.ufrn.gerfin.app.ui.state.ResumoMensalAnual
-import br.ufrn.gerfin.app.ui.theme.GestFinTheme
+import br.ufrn.gerfin.app.presentation.state.RelatorioAnualUiState
+import br.ufrn.gerfin.app.presentation.state.ResumoMensalAnual
+import br.ufrn.gerfin.app.presentation.theme.GestFinTheme
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
