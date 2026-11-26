@@ -1,0 +1,12 @@
+package br.ufrn.gerfin.app.domain.model
+
+data class Transacao(
+    val id: String,
+    val valor: String,
+    val isReceita: Boolean,
+    val data: String,
+    val categoria: String,
+    val formaPagamento: String,
+    val observacoes: String,
+    val isPago: Boolean = false,
+)
