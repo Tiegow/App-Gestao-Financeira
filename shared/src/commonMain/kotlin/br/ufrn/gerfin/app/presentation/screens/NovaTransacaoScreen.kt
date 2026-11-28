@@ -42,6 +42,8 @@ fun NovaTransacaoScreen(
     onSalvar: (Transacao) -> Unit,
     onCancelar: () -> Unit,
     initialData: String = "",
+    avisoOperacao: String? = null,
+    onTentarCarregarCategorias: () -> Unit = {},
 ) {
     val scrollState = rememberScrollState()
 
@@ -143,6 +145,16 @@ fun NovaTransacaoScreen(
                 selecionado = categoria,
                 onSelecionadoChange = { categoria = it },
             )
+
+            avisoOperacao?.let { mensagem ->
+                Text(
+                    text = mensagem,
+                    color = MaterialTheme.colorScheme.error,
+                )
+                Button(onClick = onTentarCarregarCategorias) {
+                    Text("Tentar carregar categorias novamente")
+                }
+            }
 
             CampoDropdown(
                 label = "Forma de Pagamento",

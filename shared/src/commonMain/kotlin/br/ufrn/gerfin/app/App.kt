@@ -60,6 +60,7 @@ fun App(
             val relatorioAnualState by lancamentoView.relatorioAnualState.collectAsStateWithLifecycle()
             val anoRelatorio by lancamentoView.anoRelatorio.collectAsStateWithLifecycle()
             val categorias by lancamentoView.categorias.collectAsStateWithLifecycle()
+            val avisoOperacao by lancamentoView.avisoOperacao.collectAsStateWithLifecycle()
 
             NavHost(
                 navController = navController,
@@ -130,6 +131,10 @@ fun App(
                         onAbrirRelatorioAnual = {
                             navController.navigate(RelatorioAnualRoute)
                         },
+                        avisoOperacao = avisoOperacao,
+                        onAvisoOperacaoExibido = {
+                            lancamentoView.limparAvisoOperacao()
+                        },
                     )
                 }
 
@@ -159,6 +164,10 @@ fun App(
 
                     NovaTransacaoScreen(
                         categorias = categorias,
+                        avisoOperacao = avisoOperacao,
+                        onTentarCarregarCategorias = {
+                            lancamentoView.carregarCategorias()
+                        },
                         onSalvar = { novaTransacao ->
                             val usuarioId = authViewModel.usuarioAtualId()
                             if (usuarioId != null) {
@@ -167,6 +176,7 @@ fun App(
                             }
                         },
                         onCancelar = {
+                            lancamentoView.limparAvisoOperacao()
                             navController.popBackStack()
                         },
                     )

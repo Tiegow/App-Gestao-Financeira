@@ -23,9 +23,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
@@ -46,10 +50,21 @@ fun DashboardScreen(
     onTentarNovamente: () -> Unit,
     onNovaTransacao: () -> Unit,
     onAbrirRelatorioAnual: () -> Unit = {},
+    avisoOperacao: String? = null,
+    onAvisoOperacaoExibido: () -> Unit = {},
 ) {
     val sucesso = uiState as? LancamentosUiState.Sucesso
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(avisoOperacao) {
+        avisoOperacao?.let {
+            snackbarHostState.showSnackbar(it)
+            onAvisoOperacaoExibido()
+        }
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onNovaTransacao,
