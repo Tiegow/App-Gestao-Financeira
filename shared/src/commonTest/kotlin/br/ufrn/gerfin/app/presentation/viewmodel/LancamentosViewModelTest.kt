@@ -1,10 +1,12 @@
 package br.ufrn.gerfin.app.presentation.viewmodel
 
 import app.cash.turbine.test
+import br.ufrn.gerfin.app.domain.error.LancamentoFailure
 import br.ufrn.gerfin.app.fakes.FakeLancamentoRepository
 import br.ufrn.gerfin.app.fixtures.transacaoFake
 import br.ufrn.gerfin.app.presentation.state.LancamentosUiState
 import br.ufrn.gerfin.app.presentation.state.RelatorioAnualUiState
+import br.ufrn.gerfin.app.presentation.state.TipoFalhaLancamentos
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -103,6 +105,56 @@ class LancamentosViewModelTest {
         }
 
     @Test
+    fun `falha de conexao tem estado e mensagem especificos`() =
+        runTest {
+            val viewModel =
+                LancamentosViewModel(
+                    FakeLancamentoRepository(
+                        excecao = LancamentoFailure.SemConexao(IllegalStateException("offline")),
+                    ),
+                )
+
+            viewModel.state.test {
+                awaitItem()
+                viewModel.listarLancamentos("usuario-1")
+                advanceUntilIdle()
+
+                val erro = assertIs<LancamentosUiState.Erro>(awaitItem())
+                assertEquals(TipoFalhaLancamentos.CONEXAO, erro.tipo)
+                assertEquals(
+                    "Sem conexão. Verifique sua internet e tente novamente.",
+                    erro.mensagem,
+                )
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `resposta invalida tem estado e mensagem especificos`() =
+        runTest {
+            val viewModel =
+                LancamentosViewModel(
+                    FakeLancamentoRepository(
+                        excecao = LancamentoFailure.RespostaInvalida(IllegalStateException("invalid response")),
+                    ),
+                )
+
+            viewModel.state.test {
+                awaitItem()
+                viewModel.listarLancamentos("usuario-1")
+                advanceUntilIdle()
+
+                val erro = assertIs<LancamentosUiState.Erro>(awaitItem())
+                assertEquals(TipoFalhaLancamentos.RESPOSTA_INVALIDA, erro.tipo)
+                assertEquals(
+                    "O servidor retornou uma resposta inválida. Tente novamente.",
+                    erro.mensagem,
+                )
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `tentar novamente executa uma nova busca`() =
         runTest {
             val viewModel =
@@ -149,6 +201,47 @@ class LancamentosViewModelTest {
 
                 val estado = assertIs<LancamentosUiState.Sucesso>(awaitItem())
                 assertEquals(1, estado.transacoes.size)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `falha ao salvar exibe aviso e preserva os lancamentos carregados`() =
+        runTest {
+            val transacaoExistente = transacaoFake(id = "existente")
+            val viewModel =
+                LancamentosViewModel(
+                    FakeLancamentoRepository(
+                        transacoes = listOf(transacaoExistente),
+                        excecaoInserir =
+                            LancamentoFailure.SemConexao(
+                                IllegalStateException("offline"),
+                            ),
+                    ),
+                )
+
+            viewModel.state.test {
+                awaitItem()
+                viewModel.listarLancamentos("usuario-1")
+                advanceUntilIdle()
+                val estadoAntes =
+                    assertIs<LancamentosUiState.Sucesso>(awaitItem())
+
+                viewModel.avisoOperacao.test {
+                    assertEquals(null, awaitItem())
+                    viewModel.salvarLancamento("usuario-1", transacaoFake(id = "novo"))
+                    advanceUntilIdle()
+
+                    assertEquals(
+                        "Sem conexão. O lançamento não foi salvo.",
+                        awaitItem(),
+                    )
+                    cancelAndIgnoreRemainingEvents()
+                }
+
+                val estadoDepois = assertIs<LancamentosUiState.Sucesso>(viewModel.state.value)
+                assertEquals(estadoAntes.transacoes, estadoDepois.transacoes)
+                assertEquals(listOf("existente"), estadoDepois.transacoes.map { it.id })
                 cancelAndIgnoreRemainingEvents()
             }
         }

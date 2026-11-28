@@ -2,6 +2,12 @@ package br.ufrn.gerfin.app.presentation.state
 
 import br.ufrn.gerfin.app.domain.model.Transacao
 
+enum class TipoFalhaLancamentos {
+    CONEXAO,
+    RESPOSTA_INVALIDA,
+    INESPERADA,
+}
+
 sealed interface LancamentosUiState {
     data object Carregando : LancamentosUiState
 
@@ -17,5 +23,6 @@ sealed interface LancamentosUiState {
 
     data class Erro(
         val mensagem: String,
+        val tipo: TipoFalhaLancamentos = TipoFalhaLancamentos.INESPERADA,
     ) : LancamentosUiState
 }

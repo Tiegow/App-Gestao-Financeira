@@ -68,4 +68,26 @@ class NovaTransacaoScreenTest {
 
             assertTrue(transacaoSalva)
         }
+
+    @Test
+    fun `aviso de categorias oferece nova tentativa`() =
+        runComposeUiTest {
+            var tentouNovamente = false
+
+            setContent {
+                NovaTransacaoScreen(
+                    categorias = categorias,
+                    onSalvar = {},
+                    onCancelar = {},
+                    avisoOperacao = "Sem conexão. Não foi possível carregar as categorias.",
+                    onTentarCarregarCategorias = { tentouNovamente = true },
+                )
+            }
+
+            onNodeWithText("Sem conexão. Não foi possível carregar as categorias.")
+                .assertIsDisplayed()
+            onNodeWithText("Tentar carregar categorias novamente").performClick()
+
+            assertTrue(tentouNovamente)
+        }
 }

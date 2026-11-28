@@ -2,12 +2,14 @@ package br.ufrn.gerfin.app.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import br.ufrn.gerfin.app.domain.error.LancamentoFailure
 import br.ufrn.gerfin.app.domain.model.Categoria
 import br.ufrn.gerfin.app.domain.model.Transacao
 import br.ufrn.gerfin.app.domain.repository.LancamentoRepository
 import br.ufrn.gerfin.app.presentation.state.LancamentosUiState
 import br.ufrn.gerfin.app.presentation.state.RelatorioAnualUiState
 import br.ufrn.gerfin.app.presentation.state.ResumoMensalAnual
+import br.ufrn.gerfin.app.presentation.state.TipoFalhaLancamentos
 import br.ufrn.gerfin.app.utils.formatarValor
 import br.ufrn.gerfin.app.utils.parseValor
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -111,6 +113,9 @@ class LancamentosViewModel(
     private val _categorias = MutableStateFlow<List<Categoria>>(emptyList())
     val categorias: StateFlow<List<Categoria>> = _categorias.asStateFlow()
 
+    private val _avisoOperacao = MutableStateFlow<String?>(null)
+    val avisoOperacao: StateFlow<String?> = _avisoOperacao.asStateFlow()
+
     private var mesAtual = MES_INICIAL
     private var anoAtual = ANO_INICIAL
 
@@ -197,14 +202,19 @@ class LancamentosViewModel(
 
     fun carregarCategorias() {
         viewModelScope.launch {
+            _avisoOperacao.value = null
             try {
                 _categorias.value = repository.categorias()
             } catch (e: CancellationException) {
                 throw e
-            } catch (_: Exception) {
-                // Mantém lista atual caso falhe em segundo plano
+            } catch (exception: Exception) {
+                _avisoOperacao.value = mensagemDaFalha(exception, salvamento = false)
             }
         }
+    }
+
+    fun limparAvisoOperacao() {
+        _avisoOperacao.value = null
     }
 
     fun listarLancamentos(usuarioId: String) {
@@ -218,10 +228,10 @@ class LancamentosViewModel(
                 _relatorioAnualState.value = calcularRelatorioAnual(transacoesAtuais, _anoRelatorio.value)
             } catch (e: CancellationException) {
                 throw e
-            } catch (_: Exception) {
-                val mensagemErro = "Não foi possível carregar os lançamentos."
-                _state.value = LancamentosUiState.Erro(mensagemErro)
-                _relatorioAnualState.value = RelatorioAnualUiState.Erro(mensagemErro)
+            } catch (exception: Exception) {
+                val erro = erroDeLeitura(exception)
+                _state.value = erro
+                _relatorioAnualState.value = RelatorioAnualUiState.Erro(erro.mensagem)
             }
         }
     }
@@ -231,6 +241,7 @@ class LancamentosViewModel(
         transacao: Transacao,
     ) {
         viewModelScope.launch {
+            _avisoOperacao.value = null
             try {
                 val salvo = repository.inserir(usuarioId, transacao)
                 transacoesAtuais = listOf(salvo) + transacoesAtuais
@@ -238,12 +249,53 @@ class LancamentosViewModel(
                 _relatorioAnualState.value = calcularRelatorioAnual(transacoesAtuais, _anoRelatorio.value)
             } catch (e: CancellationException) {
                 throw e
-            } catch (_: Exception) {
-                if (_state.value !is LancamentosUiState.Carregando) {
-                    _state.value = calcularEstadoDoMes()
-                    _relatorioAnualState.value = calcularRelatorioAnual(transacoesAtuais, _anoRelatorio.value)
-                }
+            } catch (exception: Exception) {
+                _avisoOperacao.value = mensagemDaFalha(exception, salvamento = true)
             }
         }
     }
+
+    private fun erroDeLeitura(exception: Exception): LancamentosUiState.Erro =
+        when (exception) {
+            is LancamentoFailure.SemConexao ->
+                LancamentosUiState.Erro(
+                    mensagem = "Sem conexão. Verifique sua internet e tente novamente.",
+                    tipo = TipoFalhaLancamentos.CONEXAO,
+                )
+            is LancamentoFailure.RespostaInvalida ->
+                LancamentosUiState.Erro(
+                    mensagem = "O servidor retornou uma resposta inválida. Tente novamente.",
+                    tipo = TipoFalhaLancamentos.RESPOSTA_INVALIDA,
+                )
+            else ->
+                LancamentosUiState.Erro(
+                    mensagem = "Não foi possível carregar os lançamentos.",
+                    tipo = TipoFalhaLancamentos.INESPERADA,
+                )
+        }
+
+    private fun mensagemDaFalha(
+        exception: Exception,
+        salvamento: Boolean,
+    ): String =
+        when (exception) {
+            is LancamentoFailure.SemConexao ->
+                if (salvamento) {
+                    "Sem conexão. O lançamento não foi salvo."
+                } else {
+                    "Sem conexão. Não foi possível carregar as categorias."
+                }
+            is LancamentoFailure.RespostaInvalida ->
+                if (salvamento) {
+                    "O servidor retornou uma resposta inválida. O lançamento não foi salvo."
+                } else {
+                    "O servidor retornou uma resposta inválida ao carregar as categorias."
+                }
+            else ->
+                if (salvamento) {
+                    "Não foi possível salvar o lançamento."
+                } else {
+                    "Não foi possível carregar as categorias."
+                }
+        }
 }

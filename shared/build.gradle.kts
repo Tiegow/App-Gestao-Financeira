@@ -75,6 +75,7 @@ kotlin {
             implementation(libs.navigation.compose)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime.lib)
+            implementation(libs.ktor.client.core)
             implementation(project.dependencies.platform(libs.supabase.bom))
             implementation(libs.supabase.postgrest)
             implementation(libs.supabase.auth)

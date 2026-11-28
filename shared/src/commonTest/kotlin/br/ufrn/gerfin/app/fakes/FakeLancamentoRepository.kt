@@ -8,6 +8,7 @@ class FakeLancamentoRepository(
     private val transacoes: List<Transacao> = emptyList(),
     private val categoriasLista: List<Categoria> = emptyList(),
     private val excecao: Exception? = null,
+    private val excecaoInserir: Exception? = null,
     respostas: List<Result<List<Transacao>>> = emptyList(),
 ) : LancamentoRepository {
     private val respostasPendentes =
@@ -30,6 +31,7 @@ class FakeLancamentoRepository(
         usuarioId: String,
         transacao: Transacao,
     ): Transacao {
+        excecaoInserir?.let { throw it }
         excecao?.let { throw it }
         return transacao
     }
